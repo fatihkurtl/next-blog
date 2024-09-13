@@ -6,7 +6,7 @@ interface RequestOptions {
   body?: any;
 }
 
-class ApiService {
+export class ApiService {
   private baseUrl: string;
 
   constructor(baseUrl: string) {
