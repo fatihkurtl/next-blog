@@ -2,7 +2,7 @@
 import { useParams } from "next/navigation";
 
 export default function PostDetail() {
-    const params = useParams();
+  const params = useParams();
   return (
     <div>
       <h1>Post Detail</h1>
