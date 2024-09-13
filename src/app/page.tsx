@@ -1,3 +1,4 @@
+"use client";
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -17,6 +18,7 @@ const blogPosts: BlogPost[] = [
 const categories = ["Web Geliştirme", "JavaScript", "CSS", "React", "Node.js"];
 
 export default function Home() {
+  console.log(process.env.NEXT_PUBLIC_BASE_API_URL);
   return (
     <div className="container mt-5">
       <header className="text-center mb-5">
