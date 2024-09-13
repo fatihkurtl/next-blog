@@ -30,7 +30,7 @@ export default function Navbar() {
               </a>
               <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                 <li><Link href="/profil" className="dropdown-item">Profil</Link></li>
-                <li><Link href="/post-paylas" className="dropdown-item">Post Paylaş</Link></li>
+                <li><Link href="/blog/post/create" className="dropdown-item">Post Paylaş</Link></li>
                 <li><Link href="/giris" className="dropdown-item">Giriş</Link></li>
                 <li><Link href="/cikis" className="dropdown-item">Çıkış</Link></li>
               </ul>
