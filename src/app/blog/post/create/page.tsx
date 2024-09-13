@@ -66,7 +66,7 @@ export default function SharePost() {
             modules={modules}
             value={content}
             onChange={(value) => setContent(value)}
-            placeholder="İçerik metnini girin..."
+            placeholder="İçerik metnini girin..."            
           />
         </div>
         <div className="mb-3">
