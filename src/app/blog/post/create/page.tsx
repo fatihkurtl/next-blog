@@ -59,7 +59,11 @@ export default function SharePost() {
         const formData = new FormData();
         Object.entries(post).forEach(([key, value]) => {
           if (value !== null) {
-            formData.append(key, value);
+            if (key === 'imageUrl' && value instanceof File) {
+              formData.append('image', value);
+            } else {
+              formData.append(key, String(value));
+            }
           }
         });
         const response = await postServices.createPost(formData as any);

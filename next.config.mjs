@@ -9,12 +9,19 @@ const nextConfig = {
         pathname: "/**",
       },
       {
-        protocol: 'https',
-        hostname: 'i.pravatar.cc',
-        port: '',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "i.pravatar.cc",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '4001',
+        pathname: '/uploads/**',
       },
     ],
+    domains: ['localhost'],
   },
 };
 

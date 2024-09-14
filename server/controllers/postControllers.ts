@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { query } from  '../utils/db';
 import { createPostTable } from '../helpers/create-post-table';
+import { uploadFile } from '../helpers/upload-file';
 
 interface BlogPost {
     id: number;
@@ -23,13 +24,21 @@ interface BlogPost {
 
 
 export const getPosts = async (req: Request, res: Response) => {
-    // res.status(200).json({ data: blogPosts });
     try {
         const result = await query('SELECT * FROM posts ORDER BY date DESC');
-        const posts: BlogPost[] = result.rows;
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const posts: BlogPost[] = result.rows.map(post => {
+            const imageUrl = post.imageurl || post.imageUrl;
+            return {
+                ...post,
+                imageUrl: imageUrl ? (imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`) : null,
+                imageurl: undefined
+            };
+        });
+        console.log('Posts:', posts); // Log the posts to check the imageUrl
         res.status(200).json({ data: posts });
     } catch (error) {
-        console.error(error);
+        console.error('Error in getPosts:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -41,23 +50,26 @@ export const createPost = async (req: Request, res: Response) => {
         console.log('Request headers:', req.headers);
         console.log('Request body:', req.body);
         console.log('Request method:', req.method);
-        console.log(req.files);
+        console.log('Request file:', req.file);
         let imageUrl = null;
+        const { title, subTitle, category, content, author } = req.body;
 
-        if (req.files && Array.isArray(req.files) && req.files.length > 0) {
-            const file = req.files[0] as Express.Multer.File;
-            console.log('Received file:', file.originalname, file.mimetype, file.size);
-            // Burada dosyayı işleyebilir veya bir CDN'e yükleyebilirsiniz
-            // Şimdilik sadece dosya adını kaydedelim
-            imageUrl = file.originalname;
-            console.log('Image URL:', imageUrl);
+        if (req.file) {
+            console.log('Received file:', req.file.originalname, req.file.mimetype, req.file.size);
+            try {
+                imageUrl = await uploadFile(req.file);
+                console.log('File uploaded successfully:', imageUrl);
+            } catch (error) {
+                console.error(error);
+            }
+
         }
-        // const result = await query(
-        //     'INSERT INTO posts (title, subTitle, category, imageUrl, content, author) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-        //     [title, subTitle, category, imageUrl, content, author]
-        // );
-        // const newPost: BlogPost = result.rows[0];
-        res.status(201).json({ message: 'Gönderi başarıyla oluşturuldu', 'success': true, data: "newPost" });
+        const result = await query(
+            'INSERT INTO posts (title, subTitle, category, imageUrl, content, author) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [title, subTitle, category, imageUrl, content, author]
+        );
+        const newPost: BlogPost = result.rows[0];
+        res.status(201).json({ message: 'Gönderi başarıyla oluşturuldu', 'success': true, data: newPost });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
