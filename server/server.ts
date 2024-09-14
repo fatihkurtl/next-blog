@@ -31,7 +31,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use('/uploads', express.static(path.join('uploads')));
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 const _prefix = '/api';
 
 app.use(`${_prefix}/posts`, upload.single('image'), postRoutes);
