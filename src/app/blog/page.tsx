@@ -4,15 +4,17 @@ import React, { useState, useEffect } from "react";
 import api from "@/services/api";
 import { PostServices } from "@/helpers/posts";
 import PostList from "@/components/blog/post-list";
+import CategoriesSidebar from "@/components/blog/categories-sidebar";
 
 const postServices = new PostServices(api);
 
-const categories = ["Web Geliştirme", "JavaScript", "CSS", "React", "Node.js"];
+// const categories = ["Web Geliştirme", "JavaScript", "CSS", "React", "Node.js"];
 
 export default function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -20,7 +22,8 @@ export default function Blog() {
         setLoading(true);
         const fetchedPosts = await postServices.getAllPosts();
         setPosts(fetchedPosts.data);
-        console.log(fetchedPosts);
+        setCategories([...fetchedPosts.data.map((post) => post.category)]);
+        console.log(fetchedPosts.data);
       } catch (error) {
         console.error(error);
         setError(
@@ -66,17 +69,7 @@ export default function Blog() {
         </div>
         <div className="col-md-4">
           <h2 className="mb-4">Kategoriler</h2>
-          <ul className="list-group">
-            {categories.map((category, index) => (
-              <li
-                key={index}
-                className="list-group-item d-flex justify-content-between align-items-center"
-              >
-                {category}
-                <span className="badge bg-primary rounded-pill">14</span>
-              </li>
-            ))}
-          </ul>
+          <CategoriesSidebar categories={categories} posts={posts} />
         </div>
       </div>
     </div>

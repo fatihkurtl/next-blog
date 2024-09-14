@@ -35,8 +35,13 @@ export const getPosts = async (req: Request, res: Response) => {
                 imageurl: undefined
             };
         });
-        console.log('Posts:', posts); // Log the posts to check the imageUrl
-        res.status(200).json({ data: posts });
+        console.log('Posts:', posts);
+        const postsWithCategories = await Promise.all(posts.map(async (post) => {
+            const category = await query('SELECT name FROM categories WHERE id = $1', [post.category_id]);
+            return { ...post, category: category.rows[0].name };
+        }));
+        console.log('Posts with categories:', postsWithCategories);
+        res.status(200).json({ data: postsWithCategories });
     } catch (error) {
         console.error('Error in getPosts:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -62,11 +67,20 @@ export const createPost = async (req: Request, res: Response) => {
             } catch (error) {
                 console.error(error);
             }
-
         }
+
+        const selectedCategory = await query('SELECT * FROM categories WHERE name = $1', [category]);
+        let categoryId;
+        if (selectedCategory.rowCount === 0) {
+            const insertResult = await query('INSERT INTO categories (name) VALUES ($1) RETURNING id', [category]);
+            categoryId = insertResult.rows[0].id;
+        } else {
+            categoryId = selectedCategory.rows[0].id;
+        }
+
         const result = await query(
-            'INSERT INTO posts (title, subTitle, category, imageUrl, content, author) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [title, subTitle, category, imageUrl, content, author]
+            'INSERT INTO posts (title, subTitle, category_id, imageUrl, content, author) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [title, subTitle, categoryId, imageUrl, content, author]
         );
         const newPost: BlogPost = result.rows[0];
         res.status(201).json({ message: 'Gönderi başarıyla oluşturuldu', 'success': true, data: newPost });

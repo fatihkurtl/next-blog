@@ -54,13 +54,12 @@ export default function SharePost() {
     e.preventDefault();
 
     try {
-      // let imageUrl = '';
       if (post?.imageUrl) {
         const formData = new FormData();
         Object.entries(post).forEach(([key, value]) => {
           if (value !== null) {
-            if (key === 'imageUrl' && value instanceof File) {
-              formData.append('image', value);
+            if (key === "imageUrl" && value instanceof File) {
+              formData.append("image", value);
             } else {
               formData.append(key, String(value));
             }
@@ -72,7 +71,6 @@ export default function SharePost() {
           console.log(response);
         }
       }
-      console.log(post);
     } catch (error) {
       console.error(error);
       alert(
@@ -81,7 +79,7 @@ export default function SharePost() {
     }
 
     alert("Post başarıyla paylaşıldı!");
-    // router.push("/blog");
+    router.push("/blog");
   };
 
   return (

@@ -39,6 +39,9 @@ export default function PostList({ posts }: PostListProps) {
                   <h5 className="card-title">{post.title}</h5>
                   <p className="card-text">{post.subTitle}</p>
                   <p className="card-text">
+                    <small>Kategori: {post.category}</small>
+                  </p>
+                  <p className="card-text">
                     <small className="text-muted">Yazar: {post.author}</small>
                     <br />
                     <small className="text-muted">
