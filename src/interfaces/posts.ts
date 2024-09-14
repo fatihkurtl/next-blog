@@ -1,7 +1,7 @@
 export interface BlogPost {
     id: number;
     title: string;
-    subTitle: string;
+    subtitle: string;
     category_id: number;
     category: string;
     imageUrl: string;
@@ -12,7 +12,7 @@ export interface BlogPost {
 
   export interface BlogPostCreate {
     title: string;
-    subTitle: string;
+    subtitle: string;
     category: string;
     imageUrl: File | null;
     content: string;

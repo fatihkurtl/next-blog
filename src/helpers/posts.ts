@@ -12,6 +12,10 @@ export class PostServices {
     return this.api.get<BlogPost[]>("/posts");
   }
 
+  async getPostById(id: string): Promise<BlogPost> {
+    return this.api.get<BlogPost>(`/posts/${id}`);
+  }
+
   async createPost(post: BlogPostCreate): Promise<any> {
     return this.api.post<BlogPost>("/posts/create", post, {
         'Content-Type': 'multipart/form-data'

@@ -22,9 +22,9 @@ export default function SharePost() {
     ],
   };
 
-  const [post, setPost] = useState<BlogPostCreate | null>({
+  const [post, setPost] = useState<BlogPostCreate>({
     title: "",
-    subTitle: "",
+    subtitle: "",
     content: "",
     category: "",
     imageUrl: null,
@@ -37,16 +37,25 @@ export default function SharePost() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setPost((prev) => ({ ...prev, [name]: value }));
+    setPost((prev) => ({
+      ...prev,
+      [name]: value as any,
+    }));
   };
 
   const handleContentChange = (value: string) => {
-    setPost((prev) => ({ ...prev, content: value }));
+    setPost((prev) => ({
+      ...prev,
+      content: value,
+    }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setPost((prev) => ({ ...prev, imageUrl: e.target.files![0] }));
+      setPost((prev) => ({
+        ...prev,
+        imageUrl: e.target.files![0],
+      }));
     }
   };
 
@@ -54,22 +63,20 @@ export default function SharePost() {
     e.preventDefault();
 
     try {
-      if (post?.imageUrl) {
-        const formData = new FormData();
-        Object.entries(post).forEach(([key, value]) => {
-          if (value !== null) {
-            if (key === "imageUrl" && value instanceof File) {
-              formData.append("image", value);
-            } else {
-              formData.append(key, String(value));
-            }
+      const formData = new FormData();
+      Object.entries(post).forEach(([key, value]) => {
+        if (value !== null) {
+          if (key === "imageUrl" && value instanceof File) {
+            formData.append("image", value);
+          } else {
+            formData.append(key, String(value));
           }
-        });
-        const response = await postServices.createPost(formData as any);
-        console.log(formData);
-        if (response.status === 201) {
-          console.log(response);
         }
+      });
+      const response = await postServices.createPost(formData as any);
+      console.log(formData);
+      if (response.status === 201) {
+        console.log(response);
       }
     } catch (error) {
       console.error(error);
@@ -95,21 +102,21 @@ export default function SharePost() {
             className="form-control"
             id="title"
             name="title"
-            value={post?.title}
+            value={post.title}
             onChange={handleInputChange}
             required
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="subTitle" className="form-label">
+          <label htmlFor="subtitle" className="form-label">
             Alt Başlık
           </label>
           <input
             type="text"
             className="form-control"
-            id="subTitle"
-            name="subTitle"
-            value={post?.subTitle}
+            id="subtitle"
+            name="subtitle"
+            value={post.subtitle}
             onChange={handleInputChange}
             required
           />
@@ -122,7 +129,7 @@ export default function SharePost() {
             className="form-control"
             id="content"
             modules={modules}
-            value={post?.content}
+            value={post.content}
             onChange={handleContentChange}
             placeholder="İçerik metnini girin..."
           />
@@ -135,7 +142,7 @@ export default function SharePost() {
             className="form-select"
             id="category"
             name="category"
-            value={post?.category}
+            value={post.category}
             onChange={handleInputChange}
             required
           >

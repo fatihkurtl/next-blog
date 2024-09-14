@@ -37,7 +37,7 @@ export default function PostList({ posts }: PostListProps) {
               <div className="col-md-8">
                 <div className="card-body">
                   <h5 className="card-title">{post.title}</h5>
-                  <p className="card-text">{post.subTitle}</p>
+                  {/* <p className="card-text">{post.subtitle}</p> */}
                   <p className="card-text">
                     <small>Kategori: {post.category}</small>
                   </p>

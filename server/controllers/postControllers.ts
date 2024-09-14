@@ -7,6 +7,7 @@ interface BlogPost {
     id: number;
     title: string;
     subTitle: string;
+    category_id: number;
     imageUrl: string;
     content: string;
     date: string;
@@ -44,6 +45,28 @@ export const getPosts = async (req: Request, res: Response) => {
         res.status(200).json({ data: postsWithCategories });
     } catch (error) {
         console.error('Error in getPosts:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+export const getPostById = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const result = await query('SELECT * FROM posts WHERE id = $1', [id]);
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const post = result.rows[0];
+        const imageUrl = post.imageurl || post.imageUrl;
+        const postData = {
+            ...post,
+            imageUrl: imageUrl ? (imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`) : null,
+            imageurl: undefined
+        };
+        const category = await query('SELECT name FROM categories WHERE id = $1', [post.category_id]);
+        postData.category = category.rows[0].name;
+        console.log('Post:', postData);
+        res.status(200).json({ data: postData });
+    } catch (error) {
+        console.error('Error in getPostById:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
