@@ -3,7 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import api from "@/services/api";
+import { BlogPostCreate } from "@/interfaces/posts";
+import { PostServices } from "@/helpers/posts";
 
+const postServices = new PostServices(api);
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
 
@@ -18,17 +22,62 @@ export default function SharePost() {
     ],
   };
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [category, setCategory] = useState("");
-  const [image, setImage] = useState<File | null>(null);
+  const [post, setPost] = useState<BlogPostCreate | null>({
+    title: "",
+    subTitle: "",
+    content: "",
+    category: "",
+    imageUrl: null,
+    author: "Fatih Kurt",
+  });
+
   const router = useRouter();
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setPost((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleContentChange = (value: string) => {
+    setPost((prev) => ({ ...prev, content: value }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setPost((prev) => ({ ...prev, imageUrl: e.target.files![0] }));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log({ title, content, category, image });
+
+    try {
+      // let imageUrl = '';
+      if (post?.imageUrl) {
+        const formData = new FormData();
+        Object.entries(post).forEach(([key, value]) => {
+          if (value !== null) {
+            formData.append(key, value);
+          }
+        });
+        const response = await postServices.createPost(formData as any);
+        console.log(formData);
+        if (response.status === 201) {
+          console.log(response);
+        }
+      }
+      console.log(post);
+    } catch (error) {
+      console.error(error);
+      alert(
+        "Post paylaşırken bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+      );
+    }
+
     alert("Post başarıyla paylaşıldı!");
-    router.push("/blog");
+    // router.push("/blog");
   };
 
   return (
@@ -43,8 +92,23 @@ export default function SharePost() {
             type="text"
             className="form-control"
             id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            name="title"
+            value={post?.title}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label htmlFor="subTitle" className="form-label">
+            Alt Başlık
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            id="subTitle"
+            name="subTitle"
+            value={post?.subTitle}
+            onChange={handleInputChange}
             required
           />
         </div>
@@ -52,21 +116,13 @@ export default function SharePost() {
           <label htmlFor="content" className="form-label">
             İçerik
           </label>
-          {/* <textarea
-            className="form-control"
-            id="content"
-            rows={6}
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            required
-          ></textarea> */}
           <ReactQuill
             className="form-control"
             id="content"
             modules={modules}
-            value={content}
-            onChange={(value) => setContent(value)}
-            placeholder="İçerik metnini girin..."            
+            value={post?.content}
+            onChange={handleContentChange}
+            placeholder="İçerik metnini girin..."
           />
         </div>
         <div className="mb-3">
@@ -76,8 +132,9 @@ export default function SharePost() {
           <select
             className="form-select"
             id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            name="category"
+            value={post?.category}
+            onChange={handleInputChange}
             required
           >
             <option value="">Kategori Seçin</option>
@@ -88,17 +145,16 @@ export default function SharePost() {
           </select>
         </div>
         <div className="mb-3">
-          <label htmlFor="image" className="form-label">
+          <label htmlFor="imageUrl" className="form-label">
             Görsel
           </label>
           <input
             type="file"
             className="form-control"
-            id="image"
+            id="imageUrl"
+            name="imageUrl"
             accept="image/*"
-            onChange={(e) =>
-              setImage(e.target.files ? e.target.files[0] : null)
-            }
+            onChange={handleImageChange}
           />
         </div>
         <button type="submit" className="btn btn-primary">
