@@ -11,7 +11,8 @@ interface PostListProps {
 export default function PostList({ posts }: PostListProps) {
     return (
         <>
-        {posts.map((post) => (
+        {posts.length > 0 ? (
+          posts.map((post) => (
             <div key={post.id} className="card mb-4">
               <div className="row g-0">
                 <div className="col-md-4">
@@ -48,7 +49,13 @@ export default function PostList({ posts }: PostListProps) {
                 </div>
               </div>
             </div>
-          ))}
+          ))
+        ) : (
+          <div className="alert alert-info" role="alert">
+            Hiç blog yazısı bulunamadı.
+          </div>
+        )  
+        }
         </>
     )
 }
