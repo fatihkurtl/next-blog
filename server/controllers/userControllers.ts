@@ -145,3 +145,11 @@ export const loginUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const isTokenValid = async (token: string): Promise<boolean> => {
+    const result = await query(
+      "SELECT * FROM tokens WHERE token = $1 AND expires_at > NOW()",
+      [token]
+    );
+    return result.rowCount! > 0;
+  };
