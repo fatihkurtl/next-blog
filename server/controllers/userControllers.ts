@@ -92,6 +92,11 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const user = selectedUser.rows[0];
 
+    if (user.token_id) {
+        await query("UPDATE users SET token_id = NULL WHERE id = $1", [user.id]);
+        await query("DELETE FROM tokens WHERE id = $1", [user.token_id]);
+    }
+
     const hashedPassword = crypto
       .createHash("sha256")
       .update(password)

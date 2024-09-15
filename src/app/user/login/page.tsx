@@ -30,9 +30,9 @@ export default function Login() {
 
   const saveUser = userStore((state) => state.setUser);
   const user = userStore((state) => state.user);
-  useEffect(() => {
-    console.log("Güncellenmiş user:", user);
-  }, [user]);
+  // useEffect(() => {
+  //   console.log("Güncellenmiş user:", user);
+  // }, [user]);
 
   const alerts = useSwal();
 
@@ -44,6 +44,7 @@ export default function Login() {
       if (response.success) {
         saveUser(response.user);
         console.log(response);
+        console.log("user:", userStore.getState().user);
         alerts.success("Hosgeldiniz", "Giriş yapıldı.");
         router.push("/");
       }
@@ -123,7 +124,7 @@ export default function Login() {
                 </div>
               </form>
               <div className="mt-3 text-center">
-                Hesabınız yok mu <Link href="/user/register">Kayıt Ol</Link>
+                Hesabınız yok mu? <Link href="/user/register">Kayıt Ol</Link>
               </div>
             </div>
           </div>
