@@ -10,6 +10,7 @@ import { userStore } from "@/stores/user";
 import { defaultAvatarUrl } from "@/constants";
 import { UpdateUserForm } from "@/interfaces/user";
 import { useSwal } from "@/utils/useSwal";
+import { getUserData } from "@/middlewares/user-save";
 
 const userServices = new UserServices(api);
 
@@ -42,21 +43,11 @@ export default function UserProfile() {
 
   useEffect(() => {
     if (user.id) {
-      getUserData();
+        getUserData(user.id, saveUser);
     }
-  }, [user.id]);
+  }, [user.id, saveUser]);
 
-  const getUserData = async () => {
-    try {
-      const response = await userServices.getUserById(user.id as number);
-      if (response.success === true) {
-          console.log('response user:', response);
-          saveUser(response.user);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

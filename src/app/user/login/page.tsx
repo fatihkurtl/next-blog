@@ -8,6 +8,7 @@ import { UserServices } from "@/helpers/users";
 import { UserLogin } from "@/interfaces/user";
 import { userStore } from "@/stores/user";
 import { useSwal } from "@/utils/useSwal";
+import { getUserData } from "@/middlewares/user-save";
 
 const userServices = new UserServices(api);
 
@@ -43,6 +44,7 @@ export default function Login() {
       const response = await userServices.loginUser(userData);
       if (response.success) {
         saveUser(response.user);
+        await getUserData(response.user.id, saveUser);
         console.log(response);
         console.log("user:", userStore.getState().user);
         alerts.success("Hosgeldiniz", "Giriş yapıldı.");
@@ -52,7 +54,7 @@ export default function Login() {
       }
     } catch (error) {
       console.log(error);
-      setError("Kullanıcı adı ya da sifre yanlış. Lütfen tekrar deneyin.");
+      setError("E-posta ya da şifre yanlış. Lütfen tekrar deneyin.");
     }
   };
 
