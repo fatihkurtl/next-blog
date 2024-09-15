@@ -3,9 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import api from "@/services/api";
+import { UserServices } from "@/helpers/users";
+import { UserLogin } from "@/interfaces/user";
+
+
+const userServices = new UserServices(api);
 
 export default function Login() {
-  const [userData, setUserData] = useState({
+  const [userData, setUserData] = useState<UserLogin>({
     email: "",
     password: "",
     remember: false,
@@ -25,6 +31,12 @@ export default function Login() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setError("");
+    try {
+      const response = await userServices.loginUser(userData);
+      console.log(response);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -95,6 +107,10 @@ export default function Login() {
                   </div>
                 </div>
               </form>
+              <div className="mt-3 text-center">
+                Hesabınız yok mu{" "}
+                <Link href="/user/registerw">Kayıt Ol</Link>
+              </div>
             </div>
           </div>
         </div>

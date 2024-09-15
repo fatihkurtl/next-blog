@@ -6,8 +6,8 @@ import Link from "next/link";
 
 import { useSwal } from "@/utils/useSwal";
 import api from "@/services/api";
-import { UserRegister } from "@/interfaces/user";
 import { UserServices } from "@/helpers/users";
+import { UserRegister } from "@/interfaces/user";
 
 const userServices = new UserServices(api);
 

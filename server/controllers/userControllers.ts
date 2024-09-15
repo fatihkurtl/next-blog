@@ -57,3 +57,38 @@ export const saveUser = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+export const loginUser = async (req: Request, res: Response) => {
+    try {
+        console.log('Request body:', req.body);
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ error: 'E-posta adresi ve şifre gereklidir.' });
+        }
+
+        const selectedUser = await query('SELECT * FROM users WHERE email = $1', [email]);
+        
+        if (selectedUser.rowCount === 0) {
+            return res.status(400).json({ error: 'Kullanıcı bulunamadı.' });
+        }
+
+        const user = selectedUser.rows[0];
+
+        const hashedPassword = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+        const passwordHash = Array.from(new Uint8Array(hashedPassword));
+        const passwordHashString = passwordHash.join(',');
+
+        if (user.password !== passwordHashString) {
+            return res.status(400).json({ error: 'Hatalı sifre.' });
+        }
+
+        console.log('User logged in:', user);
+
+
+        res.status(200).json({ 'success': true });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}

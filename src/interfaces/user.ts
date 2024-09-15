@@ -9,8 +9,9 @@ export interface UserRegister {
 }
 
 export interface UserLogin {
-    username: string;
+    email: string;
     password: string;
+    remember: boolean;
 }
 
 export interface User {
