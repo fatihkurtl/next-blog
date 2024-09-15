@@ -85,7 +85,7 @@ export const createPost = async (req: Request, res: Response) => {
         console.log('author:', author);
 
         if (req.file) {
-            console.log('Received file:', req.file.originalname, req.file.mimetype, req.file.size);
+            // console.log('Received file:', req.file.originalname, req.file.mimetype, req.file.size);
             try {
                 imageUrl = await uploadFile(req.file);
                 console.log('File uploaded successfully:', imageUrl);

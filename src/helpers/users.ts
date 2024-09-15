@@ -19,4 +19,16 @@ export class UserServices {
       "Content-Type": "multipart/form-data",
     });
   }
+
+  async updateUser(id: number, userData: any): Promise<any> {
+    return this.api.put(`/users/update/${id}`, userData, {
+      "Content-Type": "multipart/form-data",
+    });
+  }
+
+  async getUserById(id: number): Promise<any> {
+    return this.api.get(`/users/${id}`, {
+      "Content-Type": "multipart/form-data",
+    });
+  }
 }

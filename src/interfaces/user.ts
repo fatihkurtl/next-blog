@@ -24,3 +24,10 @@ export interface User {
     token: string;
     expires_at: string;
 }
+
+export interface UpdateUserForm {
+    fullname: string;
+    username: string;
+    email: string;
+    image: File | null;
+}

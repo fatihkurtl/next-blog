@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { userStore } from "@/stores/user";
 import { slugify } from "@/utils/slugify";
+import { defaultAvatarUrl } from "@/constants"; 
 
 export default function Navbar() {
   const user = userStore((state) => state.user);
@@ -59,7 +60,7 @@ export default function Navbar() {
                 aria-expanded="false"
               >
                 <Image
-                  src="https://i.pravatar.cc/150?img=3"
+                  src={user.image || defaultAvatarUrl}
                   width={32}
                   height={32}
                   className="rounded-circle"
