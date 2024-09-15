@@ -63,7 +63,9 @@ export default function Register() {
           confirmPassword: "",
           terms: false,
         });
-        router.push("/user/login");
+        setTimeout(() => {
+          router.push("/user/login");
+        }, 1000);
       } else {
         console.log("Unexpected response:", response.data);
         setError(response.data.error || "Beklenmeyen bir yanıt alındı.");

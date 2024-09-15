@@ -9,9 +9,12 @@ export default function CategoriesSidebar({
   categories: string[];
   posts: BlogPost[];
 }) {
+
+  const uniqueCategories = Array.from(new Set(categories));
+
   return (
     <ul className="list-group">
-      {categories.map((category, index) => (
+      {uniqueCategories.map((category, index) => (
         <li
           key={index}
           className="list-group-item d-flex justify-content-between align-items-center"

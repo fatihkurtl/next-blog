@@ -85,7 +85,7 @@ export default function Navbar() {
                         href="/blog/auth/post/create"
                         className="dropdown-item"
                       >
-                        Post Paylaş
+                        Gönderi Paylaş
                       </Link>
                     </li>
                     <li>

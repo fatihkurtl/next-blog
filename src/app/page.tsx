@@ -1,24 +1,67 @@
 "use client";
+import React, { useState, useEffect } from "react";
 import Image from 'next/image';
 import Link from 'next/link';
+import api from "@/services/api";
+import { PostServices } from "@/helpers/posts";
+import { BlogPost } from "@/interfaces/posts";
+import PostList from "@/components/blog/post-list";
+import CategoriesSidebar from "@/components/blog/categories-sidebar";
 
-interface BlogPost {
-  id: number;
-  title: string;
-  excerpt: string;
-  imageUrl: string;
-}
+// interface BlogPost {
+//   id: number;
+//   title: string;
+//   excerpt: string;
+//   imageUrl: string;
+// }
 
-const blogPosts: BlogPost[] = [
-  { id: 1, title: "Next.js'e Giriş", excerpt: "Next.js'in temel özelliklerini ve avantajlarını keşfedin.", imageUrl: "https://picsum.photos/seed/nextjs/400/300" },
-  { id: 2, title: "Bootstrap ile Responsive Tasarım", excerpt: "Bootstrap grid sistemini kullanarak mobil uyumlu web siteleri oluşturun.", imageUrl: "https://picsum.photos/seed/bootstrap/400/300" },
-  { id: 3, title: "TypeScript ve React", excerpt: "React projelerinizde TypeScript kullanmanın faydalarını öğrenin.", imageUrl: "https://picsum.photos/seed/typescript/400/300" },
-];
-
-const categories = ["Web Geliştirme", "JavaScript", "CSS", "React", "Node.js"];
+const postServices = new PostServices(api);
 
 export default function Home() {
-  console.log(process.env.NEXT_PUBLIC_BASE_API_URL);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [allPosts, setAllPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const fetchedPosts = await postServices.getAllPosts();
+        setPosts(fetchedPosts.data.slice(0, 3));
+        setAllPosts(fetchedPosts.data);
+        setCategories([...fetchedPosts.data.map((post) => post.category)]);
+        console.log(fetchedPosts.data);
+      } catch (error) {
+        console.error(error);
+        setError(
+          "Gönderiler yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
+  }, []);
+
+
+  if (loading) {
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner-border" role="status"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="alert alert-danger mt-5" role="alert">
+        {error}
+      </div>
+    );
+  }
+
   return (
     <div className="container mt-5">
       <header className="text-center mb-5">
@@ -29,33 +72,11 @@ export default function Home() {
       <div className="row">
         <div className="col-md-8">
           <h2 className="mb-4">Son Yazılar</h2>
-          {blogPosts.map((post) => (
-            <div key={post.id} className="card mb-4">
-              <div className="row g-0">
-                <div className="col-md-4">
-                  <Image src={post.imageUrl} alt={post.title} width={400} height={300} className="img-fluid rounded-start" />
-                </div>
-                <div className="col-md-8">
-                  <div className="card-body">
-                    <h5 className="card-title">{post.title}</h5>
-                    <p className="card-text">{post.excerpt}</p>
-                    <Link href={`/blog/${post.id}`} className="btn btn-primary">Devamını Oku</Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+          <PostList posts={posts} />
         </div>
         <div className="col-md-4">
           <h2 className="mb-4">Kategoriler</h2>
-          <ul className="list-group">
-            {categories.map((category, index) => (
-              <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                {category}
-                <span className="badge bg-primary rounded-pill">14</span>
-              </li>
-            ))}
-          </ul>
+          <CategoriesSidebar categories={categories} posts={allPosts} />
         </div>
       </div>
     </div>

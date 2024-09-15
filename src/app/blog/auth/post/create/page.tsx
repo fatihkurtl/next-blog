@@ -6,6 +6,8 @@ import dynamic from "next/dynamic";
 import api from "@/services/api";
 import { BlogPostCreate } from "@/interfaces/posts";
 import { PostServices } from "@/helpers/posts";
+import { useSwal } from "@/utils/useSwal";
+import { userStore } from "@/stores/user";
 
 const postServices = new PostServices(api);
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
@@ -22,13 +24,16 @@ export default function SharePost() {
     ],
   };
 
+  const alerts = useSwal();
+  const loggedInUser = userStore((state) => state.user);
+
   const [post, setPost] = useState<BlogPostCreate>({
     title: "",
     subtitle: "",
     content: "",
     category: "",
     imageUrl: null,
-    author: "Fatih Kurt",
+    author: loggedInUser.fullname !== "" ? loggedInUser.fullname : "",
   });
 
   const router = useRouter();
@@ -75,8 +80,13 @@ export default function SharePost() {
       });
       const response = await postServices.createPost(formData as any);
       console.log(formData);
-      if (response.status === 201) {
+      console.log(response);
+      if (response.success === true) {
         console.log(response);
+        alerts.success("Başarılı", "Yeni post paylaşıldı.");
+        setTimeout(() => {
+          router.push("/blog");
+        }, 1000);
       }
     } catch (error) {
       console.error(error);
@@ -84,14 +94,11 @@ export default function SharePost() {
         "Post paylaşırken bir hata oluştu. Lütfen daha sonra tekrar deneyin."
       );
     }
-
-    alert("Post başarıyla paylaşıldı!");
-    router.push("/blog");
   };
 
   return (
     <div className="container mt-5">
-      <h1 className="mb-4">Yeni Post Paylaş</h1>
+      <h1 className="mb-4">Yeni Gönderi Paylaş</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label htmlFor="title" className="form-label">

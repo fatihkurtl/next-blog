@@ -75,12 +75,14 @@ export const createPost = async (req: Request, res: Response) => {
     try {
         await createPostTable();
         // const { title, subTitle, category, imageUrl, content, author } = req.body;
-        console.log('Request headers:', req.headers);
-        console.log('Request body:', req.body);
-        console.log('Request method:', req.method);
-        console.log('Request file:', req.file);
+        // console.log('Request headers:', req.headers);
+        // console.log('Request body:', req.body);
+        // console.log('Request method:', req.method);
+        // console.log('Request file:', req.file);
         let imageUrl = null;
-        const { title, subTitle, category, content, author } = req.body;
+        const { title, subtitle, category, content, author } = req.body;
+
+        console.log('author:', author);
 
         if (req.file) {
             console.log('Received file:', req.file.originalname, req.file.mimetype, req.file.size);
@@ -104,7 +106,7 @@ export const createPost = async (req: Request, res: Response) => {
 
         const result = await query(
             'INSERT INTO posts (title, subTitle, category_id, imageUrl, content, author) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [title, subTitle, categoryId, imageUrl, content, author]
+            [title, subtitle, categoryId, imageUrl, content, author]
         );
         const newPost: BlogPost = result.rows[0];
         res.status(201).json({ message: 'Gönderi başarıyla oluşturuldu', 'success': true, data: newPost });

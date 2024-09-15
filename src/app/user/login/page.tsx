@@ -46,7 +46,9 @@ export default function Login() {
         console.log(response);
         console.log("user:", userStore.getState().user);
         alerts.success("Hosgeldiniz", "Giriş yapıldı.");
-        router.push("/");
+        setTimeout(() => {        
+          router.push("/");
+        }, 1000);
       }
     } catch (error) {
       console.log(error);
