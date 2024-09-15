@@ -31,3 +31,9 @@ export interface UpdateUserForm {
     email: string;
     image: File | null;
 }
+
+export interface UpdatePasswordForm {
+    oldPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+}

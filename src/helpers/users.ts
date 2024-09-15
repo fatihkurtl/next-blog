@@ -31,4 +31,10 @@ export class UserServices {
       "Content-Type": "multipart/form-data",
     });
   }
+
+  async updateUserPassword(id: number, userData: any): Promise<any> {
+    return this.api.put(`/users/update/password/${id}`, userData, {
+      "Content-Type": "multipart/form-data",
+    });
+  }
 }

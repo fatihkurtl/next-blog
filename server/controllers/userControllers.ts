@@ -259,6 +259,31 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
+export const updateUserPassword = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { oldPassword, newPassword } = req.body;
+        console.log("user id:", id);
+        console.log("user update body:", oldPassword, newPassword);
+        const selectedUser = await query("SELECT * FROM users WHERE id = $1", [id]);
+        console.log("selectedUser:", selectedUser.rows[0]);
+        if (selectedUser.rowCount === 0) {
+            return res.status(400).json({ error: "Kullanıcı bulunamadı." });
+        }
+        
+        const hashedPassword = crypto.createHash("sha256").update(oldPassword).digest("hex");
+
+        if (selectedUser.rows[0].password !== hashedPassword) {
+            return res.status(400).json({ error: "Eski şifre hatalı." });
+        }
+        
+        return res.status(200).json({ success: true, message: "Şifre güncellendi." });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 export const isTokenValid = async (token: string): Promise<boolean> => {
   const result = await query(
     "SELECT * FROM tokens WHERE token = $1 AND expires_at > NOW()",
