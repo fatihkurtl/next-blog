@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "@/services/api";
 import { UserServices } from "@/helpers/users";
-import { User, UserLogin } from "@/interfaces/user";
+import { UserLogin } from "@/interfaces/user";
 import { userStore } from "@/stores/user";
+import { useSwal } from "@/utils/useSwal";
 
 const userServices = new UserServices(api);
 
@@ -32,6 +33,9 @@ export default function Login() {
   useEffect(() => {
     console.log("Güncellenmiş user:", user);
   }, [user]);
+
+  const alerts = useSwal();
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setError("");
@@ -40,7 +44,8 @@ export default function Login() {
       if (response.success) {
         saveUser(response.user);
         console.log(response);
-        // router.push("/");
+        alerts.success("Hosgeldiniz", "Giriş yapıldı.");
+        router.push("/");
       }
     } catch (error) {
       console.log(error);
