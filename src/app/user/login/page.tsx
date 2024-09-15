@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "@/services/api";
 import { UserServices } from "@/helpers/users";
-import { UserLogin } from "@/interfaces/user";
-
+import { User, UserLogin } from "@/interfaces/user";
+import { userStore } from "@/stores/user";
 
 const userServices = new UserServices(api);
 
@@ -19,8 +19,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-
-  const handleChange = (e: any) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setUserData({
       ...userData,
@@ -28,16 +27,26 @@ export default function Login() {
     });
   };
 
+  const saveUser = userStore((state) => state.setUser);
+  const user = userStore((state) => state.user);
+  useEffect(() => {
+    console.log("Güncellenmiş user:", user);
+  }, [user]);
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setError("");
     try {
       const response = await userServices.loginUser(userData);
-      console.log(response);
+      if (response.success) {
+        saveUser(response.user);
+        console.log(response);
+        // router.push("/");
+      }
     } catch (error) {
       console.log(error);
+      setError("Kullanıcı adı ya da sifre yanlış. Lütfen tekrar deneyin.");
     }
-  }
+  };
 
   return (
     <div className="container mt-5">
@@ -46,6 +55,7 @@ export default function Login() {
           <div className="card">
             <div className="card-body">
               <h2 className="card-title text-center mb-4">Giriş Yap</h2>
+              {error && <div className="alert alert-danger mt-3">{error}</div>}
               <form onSubmit={handleSubmit}>
                 <div className="row gy-3 gy-md-4 overflow-hidden">
                   <div className="col-12">
@@ -77,7 +87,7 @@ export default function Login() {
                       placeholder="********"
                       required
                     />
-                  </div>                  
+                  </div>
                   <div className="col-12">
                     <div className="form-check">
                       <input
@@ -108,8 +118,7 @@ export default function Login() {
                 </div>
               </form>
               <div className="mt-3 text-center">
-                Hesabınız yok mu{" "}
-                <Link href="/user/registerw">Kayıt Ol</Link>
+                Hesabınız yok mu <Link href="/user/register">Kayıt Ol</Link>
               </div>
             </div>
           </div>

@@ -16,7 +16,8 @@
     "react-dom": "^18",
     "react-quill": "^2.0.0",
     "sass": "^1.78.0",
-    "sweetalert2": "^11.14.0"
+    "sweetalert2": "^11.14.0",
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -16,10 +16,10 @@ export interface UserLogin {
 
 export interface User {
     id: number;
-    fullName: string;
-    username: string;
+    fullname: string;
     image: string | null;
+    username: string;
     email: string;
-    password: string;
     date: string;
+    token: string;
 }
