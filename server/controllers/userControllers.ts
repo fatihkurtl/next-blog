@@ -167,16 +167,19 @@ export const getUser = async (req: Request, res: Response) => {
       imageUrl: undefined,
     };
     console.log("User:", userData);
-    res.status(200).json({ success: true, user: {
-      id: userData.id,
-      fullname: userData.fullname,
-      image: userData.image,
-      username: userData.username,
-      email: userData.email,
-      date: userData.date,
-      terms: userData.terms,
-      token: userData.token,
-    } });
+    res.status(200).json({
+      success: true,
+      user: {
+        id: userData.id,
+        fullname: userData.fullname,
+        image: userData.image,
+        username: userData.username,
+        email: userData.email,
+        date: userData.date,
+        terms: userData.terms,
+        token: userData.token,
+      },
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });
@@ -200,6 +203,12 @@ export const updateUser = async (req: Request, res: Response) => {
           req.file.size
         );
         imageUrl = await uploadFile(req.file);
+
+        const saveImage = await query(
+          "UPDATE users SET imageurl = $1 WHERE id = $2",
+          [imageUrl, id]
+        );
+        console.log("saveImage:", saveImage);
         console.log("File uploaded successfully:", imageUrl);
       } catch (error) {
         console.error(error);
@@ -217,8 +226,8 @@ export const updateUser = async (req: Request, res: Response) => {
     console.log("Selected user:", user);
 
     const updatedUser = await query(
-      "UPDATE users SET fullname = $1, username = $2, email = $3, imageurl = $4 WHERE id = $5 RETURNING *",
-      [fullname, username, email, imageUrl, id]
+      "UPDATE users SET fullname = $1, username = $2, email = $3 WHERE id = $4 RETURNING *",
+      [fullname, username, email, id]
     );
 
     if (updatedUser.rowCount === 0) {

@@ -104,7 +104,7 @@ export default function UserProfile() {
       if (response.success === true) {
         console.log(response);
         // saveUser(response.user);
-        alerts.success("Hosgeldiniz", "Kullanıcı bilgileri kaydedildi.");
+        alerts.success("Başarılı", "Kullanıcı bilgileri güncellendi.");
       }
       console.log(formData);
       console.log(response);
@@ -177,7 +177,7 @@ export default function UserProfile() {
                   />
                 ) : (
                   <Image
-                    src={user.image}
+                    src={user.image as string || defaultAvatarUrl}
                     alt="Profil Fotoğrafı"
                     width={200}
                     height={200}
