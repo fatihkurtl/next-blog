@@ -108,10 +108,14 @@ export const loginUser = async (req: Request, res: Response) => {
     }
 
     const token = crypto.randomBytes(64).toString("hex");
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); 
     console.log("Token:", token);
+    console.log("Expires:", expiresAt);
+
+
     const result = await query(
-      "INSERT INTO tokens (token) VALUES ($1) RETURNING *",
-      [token]
+      "INSERT INTO tokens (token, expires_at) VALUES ($1, $2) RETURNING *",
+      [token, expiresAt]
     );
     const tokenId = result.rows[0].id;
 

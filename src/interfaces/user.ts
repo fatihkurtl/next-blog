@@ -22,4 +22,5 @@ export interface User {
     email: string;
     date: string;
     token: string;
+    expires_at: string;
 }

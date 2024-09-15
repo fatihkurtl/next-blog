@@ -6,7 +6,9 @@ export const createUserTable = async () => {
     await query(
         `CREATE TABLE IF NOT EXISTS tokens (
             id SERIAL PRIMARY KEY,
-            token VARCHAR(255) NOT NULL UNIQUE            
+            token VARCHAR(255) NOT NULL UNIQUE,
+            expires_at TIMESTAMP NOT NULL,
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )`
     );
 
@@ -22,7 +24,7 @@ export const createUserTable = async () => {
                 terms BOOLEAN NOT NULL DEFAULT false,
                 token_id INTEGER REFERENCES tokens (id),
                 date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (token_id) REFERENCES tokens (id)
+                FOREIGN KEY (token_id) REFERENCES tokens (id) ON DELETE CASCADE
             )`
     );
 

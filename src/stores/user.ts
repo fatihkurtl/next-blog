@@ -18,6 +18,7 @@ export const userStore = create(
         email: "",
         date: "",
         token: "",
+        expires_at: "",
       },
       setUser: (loggedInUser) => set((state) => ({
         user: { ...state.user, ...loggedInUser }

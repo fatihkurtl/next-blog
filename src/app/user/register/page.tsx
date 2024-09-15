@@ -67,13 +67,10 @@ export default function Register() {
       } else {
         console.log("Unexpected response:", response.data);
         setError(response.data.error || "Beklenmeyen bir yanıt alındı.");
-        alerts.error("Hata", response.data.error || "Beklenmeyen bir yanıt alındı.");
       }
     } catch (error) {
       console.error("Error during registration:", error);
-      setError("Bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
-      alerts.error("Hata", "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
-    }
+      setError("Bir hata oluştu. Lütfen daha sonra tekrar deneyin.");    }
   };
 
   return (
