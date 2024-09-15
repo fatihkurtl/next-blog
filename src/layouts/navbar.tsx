@@ -43,7 +43,7 @@ export default function Navbar() {
               </Link>
             </li>
             <li className="nav-item">
-              <Link href="/hakkimizda" className="nav-link">
+              <Link href="/about" className="nav-link">
                 Hakkımızda
               </Link>
             </li>
