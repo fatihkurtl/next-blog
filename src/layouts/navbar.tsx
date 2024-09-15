@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { userStore } from '@/stores/user';
+import { slugify } from '@/utils/slugify';
 
 export default function Navbar() {
   return (
@@ -29,10 +31,11 @@ export default function Navbar() {
                 <Image src="https://i.pravatar.cc/150?img=3" width={32} height={32} className="rounded-circle" alt="Profil" />
               </a>
               <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                <li><Link href="/profil" className="dropdown-item">Profil</Link></li>
-                <li><Link href="/blog/post/create" className="dropdown-item">Post Paylaş</Link></li>
-                <li><Link href="/giris" className="dropdown-item">Giriş</Link></li>
-                <li><Link href="/cikis" className="dropdown-item">Çıkış</Link></li>
+                <li><Link href={`/user/auth/profile/${slugify(userStore.getState().user.username)}`} className="dropdown-item">Profil</Link></li>
+                <li><Link href="/blog/auth/post/create" className="dropdown-item">Post Paylaş</Link></li>
+                <li><Link href="/user/register" className="dropdown-item">Register</Link></li>
+                <li><Link href="/user/login" className="dropdown-item">Giriş</Link></li>
+                <li><Link href="/user/login" className="dropdown-item">Çıkış</Link></li>
               </ul>
             </li>
           </ul>

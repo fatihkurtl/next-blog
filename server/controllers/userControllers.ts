@@ -93,8 +93,8 @@ export const loginUser = async (req: Request, res: Response) => {
     const user = selectedUser.rows[0];
 
     if (user.token_id) {
-        await query("UPDATE users SET token_id = NULL WHERE id = $1", [user.id]);
-        await query("DELETE FROM tokens WHERE id = $1", [user.token_id]);
+      await query("UPDATE users SET token_id = NULL WHERE id = $1", [user.id]);
+      await query("DELETE FROM tokens WHERE id = $1", [user.token_id]);
     }
 
     const hashedPassword = crypto
@@ -108,10 +108,9 @@ export const loginUser = async (req: Request, res: Response) => {
     }
 
     const token = crypto.randomBytes(64).toString("hex");
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); 
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
     console.log("Token:", token);
     console.log("Expires:", expiresAt);
-
 
     const result = await query(
       "INSERT INTO tokens (token, expires_at) VALUES ($1, $2) RETURNING *",
@@ -138,6 +137,7 @@ export const loginUser = async (req: Request, res: Response) => {
         date: user.date,
         terms: user.terms,
         token: token,
+        expires_at: expiresAt,
       },
     });
   } catch (error) {
