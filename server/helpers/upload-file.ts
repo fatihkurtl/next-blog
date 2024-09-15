@@ -2,10 +2,10 @@ import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 
+export const uploadDir = path.join(__dirname, "..", "uploads");
 export const uploadFile = (file: Express.Multer.File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const fileName = `${uuidv4()}${path.extname(file.originalname)}`;
-    const uploadDir = path.join(__dirname, "..", "uploads");
     const filePath = path.join(__dirname, "..", "uploads", fileName);
 
     if (!fs.existsSync(uploadDir)) {

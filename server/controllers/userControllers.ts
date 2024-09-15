@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { query } from "../utils/db";
 import { createUserTable } from "../helpers/create-user-table";
 import { uploadFile } from "../helpers/upload-file";
+import { deleteOldImage } from "../helpers/delete-old-file";
 
 interface User {
   id: number;
@@ -193,6 +194,14 @@ export const updateUser = async (req: Request, res: Response) => {
     const { id } = req.params;
     console.log("user id:", id);
     console.log("user update body:", fullname, username, email);
+
+    const selectedUser = await query("SELECT * FROM users WHERE id = $1", [id]);
+    if (selectedUser.rowCount === 0) {
+      return res.status(400).json({ error: "Kullanıcı bulunamadı." });
+    }
+    const user = selectedUser.rows[0];
+    console.log("Selected user:", user);
+
     if (req.file) {
       try {
         console.log("req.file:", req.file);
@@ -202,6 +211,9 @@ export const updateUser = async (req: Request, res: Response) => {
           req.file.mimetype,
           req.file.size
         );
+
+        await deleteOldImage(user.imageurl);
+
         imageUrl = await uploadFile(req.file);
 
         const saveImage = await query(
@@ -217,13 +229,6 @@ export const updateUser = async (req: Request, res: Response) => {
           .json({ error: "Dosya yüklenirken bir hata oluştu." });
       }
     }
-
-    const selectedUser = await query("SELECT * FROM users WHERE id = $1", [id]);
-    if (selectedUser.rowCount === 0) {
-      return res.status(400).json({ error: "Kullanıcı bulunamadı." });
-    }
-    const user = selectedUser.rows[0];
-    console.log("Selected user:", user);
 
     const updatedUser = await query(
       "UPDATE users SET fullname = $1, username = $2, email = $3 WHERE id = $4 RETURNING *",
