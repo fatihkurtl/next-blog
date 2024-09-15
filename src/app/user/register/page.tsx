@@ -4,17 +4,27 @@ import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+import { useSwal } from "@/utils/useSwal";
+import api from "@/services/api";
+import { UserRegister } from "@/interfaces/user";
+import { UserServices } from "@/helpers/users";
+
+const userServices = new UserServices(api);
+
 export default function Register() {
-  const [userData, setUserData] = useState({
-    fullName: "",
+  const [userData, setUserData] = useState<UserRegister>({
+    fullname: "",
     username: "",
     email: "",
+    image: null,
     password: "",
     confirmPassword: "",
     terms: false,
   });
   const [error, setError] = useState("");
   const router = useRouter();
+
+  const alerts = useSwal();
 
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
@@ -28,29 +38,42 @@ export default function Register() {
     e.preventDefault();
     console.log(userData);
     setError("");
-
+  
     if (userData.password !== userData.confirmPassword) {
       setError("Şifreler eşleşmiyor.");
+      alerts.error("Hata", "Şifreler eşleşmiyor.");
       return;
     }
-
-    // try {
-    // Burada API'ye kayıt isteği gönderilecek
-    //   const response = await fetch("/api/register", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ username, email, password }),
-    //   });
-
-    //   if (response.ok) {
-    //     router.push("/login"); // Kayıt başarılı, giriş sayfasına yönlendir
-    //   } else {
-    //     const data = await response.json();
-    //     setError(data.message || "Kayıt sırasında bir hata oluştu.");
-    //   }
-    // } catch (error) {
-    //   setError("Bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
-    // }
+    if (!userData.terms) {
+      setError("Hüküm ve koşullar kabul edilmeli.");
+      alerts.error("Hata", "Hüküm ve koşullar kabul edilmeli.");
+      return;
+    }
+  
+    try {
+      const response = await userServices.saveUser(userData);
+      if (response.success) {
+        alerts.success("Başarılı", "Kayıt yapıldı, yönlendiriliyorsunuz...");
+        setUserData({
+          fullname: "",
+          username: "",
+          email: "",
+          image: null,
+          password: "",
+          confirmPassword: "",
+          terms: false,
+        });
+        router.push("/user/login");
+      } else {
+        console.log("Unexpected response:", response.data);
+        setError(response.data.error || "Beklenmeyen bir yanıt alındı.");
+        alerts.error("Hata", response.data.error || "Beklenmeyen bir yanıt alındı.");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      setError("Bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+      alerts.error("Hata", "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+    }
   };
 
   return (
@@ -64,15 +87,15 @@ export default function Register() {
               <form onSubmit={handleSubmit}>
                 <div className="row gy-3 gy-md-4 overflow-hidden">
                   <div className="col-12">
-                    <label htmlFor="fullName" className="form-label">
+                    <label htmlFor="fullname" className="form-label">
                       Ad Soyad <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      name="fullName"
-                      id="fullName"
-                      value={userData.fullName}
+                      name="fullname"
+                      id="fullname"
+                      value={userData.fullname}
                       onChange={handleChange}
                       placeholder="Tam Ad"
                       required
@@ -146,13 +169,18 @@ export default function Register() {
                         name="terms"
                         id="terms"
                         onChange={handleChange}
-                        required
                       />
                       <label
-                        className="form-check-label text-secondary"
+                        className={`form-check-label ${
+                          error !== ""
+                            ? userData.terms
+                              ? "text-secondary"
+                              : "text-danger"
+                            : "text-secondary"
+                        }`}
                         htmlFor="terms"
                       >
-                        Hüküm ve koşulları kabul ediyorum
+                        Hüküm ve koşulları kabul ediyorum.
                       </label>
                     </div>
                   </div>

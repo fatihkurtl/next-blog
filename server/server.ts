@@ -7,6 +7,7 @@ import path from 'path';
 import { app, PORT } from './config';
 // import { getPosts } from './controllers/postControllers';
 import postRoutes from './routes/postRoutes';
+import userRoutes from './routes/userRoutes';
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -37,6 +38,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const _prefix = '/api';
 
 app.use(`${_prefix}/posts`, upload.single('image'), postRoutes);
+
+app.use(`${_prefix}/users`, upload.single('image'), userRoutes);
 
 
 

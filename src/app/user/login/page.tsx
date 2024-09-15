@@ -6,14 +6,99 @@ import Link from "next/link";
 
 export default function Login() {
   const [userData, setUserData] = useState({
-    username: "",
+    email: "",
     password: "",
+    remember: false,
   });
   const [error, setError] = useState("");
   const router = useRouter();
+
+
+  const handleChange = (e: any) => {
+    const { name, value, type, checked } = e.target;
+    setUserData({
+      ...userData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+    setError("");
+  }
+
   return (
     <div className="container mt-5">
-      <div className="row justify-content-center">Login Page</div>
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card">
+            <div className="card-body">
+              <h2 className="card-title text-center mb-4">Giriş Yap</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="row gy-3 gy-md-4 overflow-hidden">
+                  <div className="col-12">
+                    <label htmlFor="email" className="form-label">
+                      E-posta <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      name="email"
+                      id="email"
+                      value={userData.email}
+                      onChange={handleChange}
+                      placeholder="name@example.com"
+                      required
+                    />
+                  </div>
+                  <div className="col-12">
+                    <label htmlFor="password" className="form-label">
+                      Şifre <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      className="form-control"
+                      name="password"
+                      id="password"
+                      value={userData.password}
+                      onChange={handleChange}
+                      placeholder="********"
+                      required
+                    />
+                  </div>                  
+                  <div className="col-12">
+                    <div className="form-check">
+                      <input
+                        className="form-check-input"
+                        type="checkbox"
+                        name="remember"
+                        id="remember"
+                        onChange={handleChange}
+                      />
+                      <label
+                        className="form-check-label text-secondary"
+                        htmlFor="remember"
+                      >
+                        Beni Hatırla
+                      </label>
+                    </div>
+                  </div>
+                  <div className="col-12">
+                    <div className="d-grid">
+                      <button
+                        className="btn bsb-btn-xl btn-primary"
+                        type="submit"
+                      >
+                        Giriş Yap
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

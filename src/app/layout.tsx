@@ -29,10 +29,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} d-flex flex-column min-vh-100`}
+      >
         <BootstrapClient />
         <Navbar />
-        {children}
+        <main className="flex-grow-1">{children}</main>
         <Footer />
       </body>
     </html>

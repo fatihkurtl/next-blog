@@ -89,6 +89,7 @@ export const createPost = async (req: Request, res: Response) => {
                 console.log('File uploaded successfully:', imageUrl);
             } catch (error) {
                 console.error(error);
+                return res.status(500).json({ error: 'Dosya yüklenirken bir hata oluştu.' });
             }
         }
 
