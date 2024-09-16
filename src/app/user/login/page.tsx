@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import api from "@/services/api";
 import { UserServices } from "@/helpers/users";
 import { UserLogin } from "@/interfaces/user";
 import { userStore } from "@/stores/user";
 import { useSwal } from "@/utils/useSwal";
 import { getUserData } from "@/middlewares/user-save";
+import LoginForm from "@/components/user/login-form";
 
 const userServices = new UserServices(api);
 
@@ -30,14 +30,10 @@ export default function Login() {
   };
 
   const saveUser = userStore((state) => state.setUser);
-  const user = userStore((state) => state.user);
-  // useEffect(() => {
-  //   console.log("Güncellenmiş user:", user);
-  // }, [user]);
 
   const alerts = useSwal();
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     try {
@@ -45,8 +41,6 @@ export default function Login() {
       if (response.success) {
         saveUser(response.user);
         await getUserData(response.user.id, saveUser);
-        console.log(response);
-        console.log("user:", userStore.getState().user);
         alerts.success("Hosgeldiniz", "Giriş yapıldı.");
         setTimeout(() => {        
           router.push("/");
@@ -62,76 +56,12 @@ export default function Login() {
     <div className="container mt-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
-          <div className="card">
-            <div className="card-body">
-              <h2 className="card-title text-center mb-4">Giriş Yap</h2>
-              {error && <div className="alert alert-danger mt-3">{error}</div>}
-              <form onSubmit={handleSubmit}>
-                <div className="row gy-3 gy-md-4 overflow-hidden">
-                  <div className="col-12">
-                    <label htmlFor="email" className="form-label">
-                      E-posta <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      name="email"
-                      id="email"
-                      value={userData.email}
-                      onChange={handleChange}
-                      placeholder="name@example.com"
-                      required
-                    />
-                  </div>
-                  <div className="col-12">
-                    <label htmlFor="password" className="form-label">
-                      Şifre <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="password"
-                      className="form-control"
-                      name="password"
-                      id="password"
-                      value={userData.password}
-                      onChange={handleChange}
-                      placeholder="********"
-                      required
-                    />
-                  </div>
-                  <div className="col-12">
-                    <div className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        name="remember"
-                        id="remember"
-                        onChange={handleChange}
-                      />
-                      <label
-                        className="form-check-label text-secondary"
-                        htmlFor="remember"
-                      >
-                        Beni Hatırla
-                      </label>
-                    </div>
-                  </div>
-                  <div className="col-12">
-                    <div className="d-grid">
-                      <button
-                        className="btn bsb-btn-xl btn-primary"
-                        type="submit"
-                      >
-                        Giriş Yap
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-              <div className="mt-3 text-center">
-                Hesabınız yok mu? <Link href="/user/register">Kayıt Ol</Link>
-              </div>
-            </div>
-          </div>
+          <LoginForm
+            userData={userData}
+            error={error}
+            handleChange={handleChange}
+            handleSubmit={handleSubmit}
+          />
         </div>
       </div>
     </div>

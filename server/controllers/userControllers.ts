@@ -23,12 +23,6 @@ export const saveUser = async (req: Request, res: Response) => {
 
     const { fullname, username, email, password, terms } = req.body;
     if (req.file) {
-      console.log(
-        "Received file:",
-        req.file.originalname,
-        req.file.mimetype,
-        req.file.size
-      );
       try {
         imageUrl = await uploadFile(req.file);
         console.log("File uploaded successfully:", imageUrl);
@@ -58,26 +52,21 @@ export const saveUser = async (req: Request, res: Response) => {
       .update(password)
       .digest("hex");
 
-    console.log("Hashed password:", hashedPassword);
-
-    const result = await query(
+    await query(
       "INSERT INTO users (fullname, username, email, password, terms) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [fullname, username, email, hashedPassword, terms]
     );
-    const newUser: User = result.rows[0];
-    console.log("User created:", newUser);
-    res
+    return res
       .status(201)
       .json({ message: "Kullanıcı başarıyla kaydedildi.", success: true });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
 export const loginUser = async (req: Request, res: Response) => {
   try {
-    console.log("Request body:", req.body);
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -106,15 +95,12 @@ export const loginUser = async (req: Request, res: Response) => {
       .update(password)
       .digest("hex");
 
-    console.log("Hashed password:", hashedPassword);
     if (user.password !== hashedPassword) {
       return res.status(400).json({ error: "Hatalı sifre." });
     }
 
     const token = crypto.randomBytes(64).toString("hex");
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    console.log("Token:", token);
-    console.log("Expires:", expiresAt);
 
     const result = await query(
       "INSERT INTO tokens (token, expires_at) VALUES ($1, $2) RETURNING *",
@@ -129,7 +115,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     console.log("User logged in:", user);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Giriş başarılı.",
       user: {
@@ -146,7 +132,7 @@ export const loginUser = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -167,8 +153,8 @@ export const getUser = async (req: Request, res: Response) => {
         : null,
       imageUrl: undefined,
     };
-    console.log("User:", userData);
-    res.status(200).json({
+
+    return res.status(200).json({
       success: true,
       user: {
         id: userData.id,
@@ -183,7 +169,7 @@ export const getUser = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -192,36 +178,23 @@ export const updateUser = async (req: Request, res: Response) => {
     let imageUrl = null;
     const { fullname, username, email } = req.body;
     const { id } = req.params;
-    console.log("user id:", id);
-    console.log("user update body:", fullname, username, email);
 
     const selectedUser = await query("SELECT * FROM users WHERE id = $1", [id]);
     if (selectedUser.rowCount === 0) {
       return res.status(400).json({ error: "Kullanıcı bulunamadı." });
     }
     const user = selectedUser.rows[0];
-    console.log("Selected user:", user);
 
     if (req.file) {
       try {
-        console.log("req.file:", req.file);
-        console.log(
-          "Received file:",
-          req.file.originalname,
-          req.file.mimetype,
-          req.file.size
-        );
-
         await deleteOldImage(user.imageurl);
 
         imageUrl = await uploadFile(req.file);
 
-        const saveImage = await query(
-          "UPDATE users SET imageurl = $1 WHERE id = $2",
-          [imageUrl, id]
-        );
-        console.log("saveImage:", saveImage);
-        console.log("File uploaded successfully:", imageUrl);
+        await query("UPDATE users SET imageurl = $1 WHERE id = $2", [
+          imageUrl,
+          id,
+        ]);
       } catch (error) {
         console.error(error);
         return res
@@ -243,7 +216,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
     console.log("Updated user:", updatedUser.rows[0]);
     console.log(user.imageurl);
-    res.status(200).json({
+    return res.status(200).json({
       message: "Kullanıcı bilgileri güncellendi.",
       success: true,
       user: {
@@ -255,7 +228,7 @@ export const updateUser = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -263,10 +236,9 @@ export const updateUserPassword = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { oldPassword, newPassword } = req.body;
-    console.log("user id:", id);
-    console.log("user update body:", oldPassword, newPassword);
+
     const selectedUser = await query("SELECT * FROM users WHERE id = $1", [id]);
-    console.log("selectedUser:", selectedUser.rows[0]);
+
     if (selectedUser.rowCount === 0) {
       return res.status(400).json({ error: "Kullanıcı bulunamadı." });
     }
@@ -294,7 +266,7 @@ export const updateUserPassword = async (req: Request, res: Response) => {
       .json({ success: true, message: "Şifre güncellendi." });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -325,10 +297,10 @@ export const getUserPosts = async (req: Request, res: Response) => {
       })
     );
 
-    res.status(200).json({ data: postsWithCategories });
+    return res.status(200).json({ data: postsWithCategories });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -338,8 +310,7 @@ export const updateUserPost = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { title, subtitle, category, category_id, content, user_id } =
       req.body;
-    console.log("req.body:", req.body);
-    console.log("post id:", id);
+
     const selectedPost = await query("SELECT * FROM posts WHERE id = $1", [id]);
     const post = selectedPost.rows[0];
     if (post.rowCount === 0) {
@@ -347,21 +318,13 @@ export const updateUserPost = async (req: Request, res: Response) => {
     }
     if (req.file) {
       try {
-        console.log("req.file:", req.file);
-        console.log(
-          "Received file:",
-          req.file.originalname,
-          req.file.mimetype,
-          req.file.size
-        );
         await deleteOldImage(post.imageurl);
         imageUrl = await uploadFile(req.file);
 
-        const updatePostImage = await query(
-          "UPDATE posts SET imageUrl = $1 WHERE id = $2",
-          [imageUrl, id]
-        );
-        console.log("updatePostImage:", updatePostImage);
+        await query("UPDATE posts SET imageUrl = $1 WHERE id = $2", [
+          imageUrl,
+          id,
+        ]);
       } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Dosya yüklenirken bir hata oluştu." });
@@ -375,16 +338,9 @@ export const updateUserPost = async (req: Request, res: Response) => {
       [title, subtitle, category_id, content, imageUrl, id]
     );
 
-    // const updatePostCategory = await query(
-    //   "UPDATE categories SET name = $1 WHERE id = $2",
-    //   [category, category_id]
-    // );
-    // console.log("updatePostCategory:", updatePostCategory.rows[0]);
-
     if (updatePost.rowCount === 0) {
       return res.status(400).json({ error: "Post güncellenemedi." });
     }
-    console.log("updatePost:", updatePost.rows[0]);
 
     return res
       .status(200)
@@ -423,12 +379,21 @@ export const deleteUserPost = async (req: Request, res: Response) => {
   }
 };
 
-export const isTokenValid = async (req: Request, res: Response): Promise<boolean> => {
-  const { token } = req.body;
-  console.log(token);
-  const result = await query(
-    "SELECT * FROM tokens WHERE token = $1 AND expires_at > NOW()",
-    [token]
-  );
-  return result.rowCount! > 0;
+export const isTokenValid = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { token } = req.body;
+    const result = await query(
+      "SELECT * FROM tokens WHERE token = $1 AND expires_at > NOW()",
+      [token]
+    );
+    const isValid = result.rowCount! > 0;
+    res.json({ isValid });
+  } catch (error) {
+    console.error("Token kontrol hatası:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };

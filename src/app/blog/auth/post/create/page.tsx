@@ -81,10 +81,7 @@ export default function SharePost() {
         }
       });
       const response = await postServices.createPost(formData as any);
-      console.log(formData);
-      console.log(response);
       if (response.success === true) {
-        console.log(response);
         alerts.success("Başarılı", "Yeni post paylaşıldı.");
         setTimeout(() => {
           router.push("/blog");
@@ -92,9 +89,7 @@ export default function SharePost() {
       }
     } catch (error) {
       console.error(error);
-      alert(
-        "Post paylaşırken bir hata oluştu. Lütfen daha sonra tekrar deneyin."
-      );
+      alerts.error("Hata", "Yeni post paylaşılırken bir hata oluştu.");
     }
   };
 

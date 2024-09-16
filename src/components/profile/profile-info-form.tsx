@@ -57,7 +57,6 @@ export default function ProfileInfoForm() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(userForm);
     try {
       const formData = new FormData();
       Object.entries(userForm).forEach(([key, value]) => {
@@ -74,14 +73,15 @@ export default function ProfileInfoForm() {
         formData as any
       );
       if (response.success === true) {
-        console.log(response);
         // saveUser(response.user);
         alerts.success("Başarılı", "Kullanıcı bilgileri güncellendi.");
       }
-      console.log(formData);
-      console.log(response);
     } catch (error) {
       console.log(error);
+      alerts.error(
+        "Hata",
+        "Kullanıcı bilgileri güncellenirken bir hata oluştu."
+      );
     }
   };
   return (
@@ -100,20 +100,26 @@ export default function ProfileInfoForm() {
         />
       </div>
       {userForm.image !== null ? (
-        <Image
-          src={URL.createObjectURL(userForm.image)}
-          alt="Profil Fotoğrafı"
-          width={200}
-          height={200}
-        />
+        <>
+          <p>Önizleme:</p>
+          <Image
+            src={URL.createObjectURL(userForm.image)}
+            alt="Profil Fotoğrafı"
+            width={200}
+            height={200}
+          />
+        </>
       ) : (
-        <Image
-          src={(user.image as string) || defaultAvatarUrl}
-          alt="Profil Fotoğrafı"
-          width={200}
-          height={200}
-          className="img-thumbnail mb-3"
-        />
+        <>
+          <p>Önizleme:</p>
+          <Image
+            src={(user.image as string) || defaultAvatarUrl}
+            alt="Profil Fotoğrafı"
+            width={200}
+            height={200}
+            className="img-thumbnail mb-3"
+          />
+        </>
       )}
       <div className="mb-3">
         <label htmlFor="fullname" className="form-label">

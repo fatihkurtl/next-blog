@@ -46,7 +46,6 @@ export default function ChangePasswordForm() {
         changePasswordForm
       );
       if (response.success === true) {
-        console.log(response);
         alerts.success("Başarılı", "Şifre değiştirildi.");
         setChangePasswordForm({
           oldPassword: "",

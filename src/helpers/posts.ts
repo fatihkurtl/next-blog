@@ -9,7 +9,11 @@ export class PostServices {
   }
 
   async getAllPosts(): Promise<BlogPost[]> {
-    return this.api.get<BlogPost[]>("/posts");
+    return this.api.get<BlogPost[]>("/posts", {
+      next: {
+        revalidate: 5,
+      }
+    });
   }
 
   async getPostById(id: string): Promise<BlogPost> {

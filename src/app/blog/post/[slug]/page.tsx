@@ -48,8 +48,6 @@ export default function PostDetail() {
     return <div className="container mt-5">Post bulunamadı.</div>;
   }
 
-  console.log("Post data:", post);
-
   return (
     <div className="container mt-5">
       <div className="row">

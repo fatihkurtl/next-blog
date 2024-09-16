@@ -8,6 +8,7 @@ import {
   getUserPosts,
   deleteUserPost,
   updateUserPost,
+  isTokenValid,
 } from "../controllers/userControllers";
 
 const router = express.Router();
@@ -20,5 +21,7 @@ router.put("/update/password/:id", updateUserPassword);
 router.get("/posts/:id", getUserPosts);
 router.put("/update/posts/:id", updateUserPost);
 router.delete("/delete/posts/:id", deleteUserPost);
+
+router.post("/isTokenValid", isTokenValid);
 
 export default router;

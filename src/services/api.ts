@@ -36,18 +36,9 @@ export class ApiService {
       body,
     };
 
-    console.log('Request URL:', url);
-    console.log('Request Method:', options?.method);
-    console.log('Request Headers:', headers);
-    console.log('Request Body:', body instanceof FormData ? 'FormData' : body);
-
     try {
       const response = await fetch(url, config);
       const responseData = await response.text();
-      
-      console.log('Response Status:', response.status);
-      console.log('Response Headers:', response.headers);
-      console.log('Response Body:', responseData);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}, body: ${responseData}`);
@@ -60,7 +51,7 @@ export class ApiService {
     }
   }
 
-  public async get<T>(endpoint: string, headers?: Record<string, string>): Promise<T> {
+  public async get<T>(endpoint: string, headers?: Record<any, any>): Promise<T> {
     return this.request<T>(endpoint, { method: "GET", headers });
   }
 

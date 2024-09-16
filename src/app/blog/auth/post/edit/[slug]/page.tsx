@@ -52,7 +52,6 @@ export default function EditPost() {
       if (id) {
         try {
           const response = await postServices.getPostById(id);
-          console.log("Post:", response.data);
           setPost(response.data);
           if (response.data.imageUrl && typeof response.data.imageUrl === 'string') {
             setPreviewImage(response.data.imageUrl);
@@ -126,9 +125,7 @@ export default function EditPost() {
           }
         });
         const response = await userServices.updatePost(post.id, formData as any);
-        console.log(formData);
         if (response.success === true) {
-          console.log(response);
           alerts.success("Başarılı", "Gönderi güncellendi.");
           setTimeout(() => {
             router.push("/blog");

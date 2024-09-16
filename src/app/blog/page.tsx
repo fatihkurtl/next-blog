@@ -23,7 +23,6 @@ export default function Blog() {
         const fetchedPosts = await postServices.getAllPosts();
         setPosts(fetchedPosts.data);
         setCategories([...fetchedPosts.data.map((post) => post.category)]);
-        console.log(fetchedPosts.data);
       } catch (error) {
         console.error(error);
         setError(

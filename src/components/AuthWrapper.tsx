@@ -10,18 +10,21 @@ const userServices = new UserServices(api);
 
 export function AuthWrapper({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const user = userStore((state) => state.user);
+  const user = JSON.parse(localStorage.getItem("user-storage") || "{}");
+  const logOut = userStore((state) => state.logout);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const isTokenValid = user.token && new Date(user.expires_at) > new Date();
+      console.log("user token check:", user.state.user.token);
+      const isTokenValid = user.state.user.token && new Date(user.state.user.expires_at) > new Date();
       if (!isTokenValid) {
         router.push("/user/login");
       } else {
         try {
-          const isValid = await userServices.userTokenController(user.token);
+          const isValid = await userServices.userTokenController(user.state.user.token);
+          console.log("isValid:", isValid);
           if (!isValid) {
-            userStore.getState().logout();
+            logOut();
             router.push("/user/login");
           }
         } catch (error) {

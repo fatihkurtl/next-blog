@@ -27,7 +27,6 @@ export default function UserProfile() {
         const fetchedPosts = await userServices.getUserPosts(
           userLocal.state.user.id
         );
-        console.log("user posts", fetchedPosts);
         setPosts(fetchedPosts.data);
       } catch (error) {
         console.error(error);
@@ -39,7 +38,6 @@ export default function UserProfile() {
   }, []);
 
   const handleEdit = (postId: number, postTitle: string) => {
-    console.log(`Editing post ${postId} with title: ${postTitle}`);
     router.push(`/blog/auth/post/edit/${slugify(postTitle)}?id=${postId}`);
   };
 
@@ -49,7 +47,6 @@ export default function UserProfile() {
         "Gönderi Silme!",
         "Bu gönderiyi silmek istediğinizden emin misiniz?"
       );
-      console.log("Confirmed:", confirmed);
       if (confirmed) {
         await userServices.deleteUserPost(postId);
         setPosts(posts.filter((post) => post.id !== postId));

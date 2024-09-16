@@ -6,7 +6,6 @@ export const getUserData = async (userId: number, saveUser: (user: any) => void)
   try {
     const response = await userServices.getUserById(userId);
     if (response.success === true) {
-      console.log("response user:", response);
       saveUser(response.user);
     }
   } catch (error) {
