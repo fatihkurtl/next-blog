@@ -43,4 +43,10 @@ export class UserServices {
       "Content-Type": "multipart/form-data",
     });
   }
+
+  async deleteUserPost(id: number): Promise<any> {
+    return this.api.delete(`/users/delete/posts/${id}`, {
+      "Content-Type": "multipart/form-data",
+    });
+  }
 }

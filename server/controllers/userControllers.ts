@@ -313,6 +313,31 @@ export const getUserPosts = async (req: Request, res: Response) => {
     }
 };
 
+export const deleteUserPost = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const post = await query("SELECT * FROM posts WHERE id = $1", [id]);
+      if (post.rowCount === 0) {
+        return res.status(400).json({ error: "Post bulunamadı." });
+      }
+
+      const userPost = await query("DELETE FROM posts WHERE id = $1 RETURNING *", [id]);
+
+      if (userPost.rowCount === 0) {
+        return res.status(400).json({ error: "Post silinemedi." });
+      }
+      if (post.rows[0].imageurl) {
+        const imageUrl = post.rows[0].imageurl;
+        await deleteOldImage(imageUrl);
+      }
+
+      res.status(200).json({ success: true, message: "Gönderi silindi." });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+}
+
 export const isTokenValid = async (token: string): Promise<boolean> => {
   const result = await query(
     "SELECT * FROM tokens WHERE token = $1 AND expires_at > NOW()",

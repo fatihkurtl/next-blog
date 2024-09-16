@@ -7,11 +7,13 @@ import PostList from "@/components/blog/post-list";
 import { BlogPost } from "@/interfaces/posts";
 import ProfileInfoForm from "@/components/profile/profile-info-form";
 import ChangePasswordForm from "@/components/profile/change-password-form";
+import { useSwal } from "@/utils/useSwal";
 
 const userServices = new UserServices(api);
 
 export default function UserProfile() {
   const userLocal = JSON.parse(localStorage.getItem("user-storage") || "{}");
+  const alerts = useSwal();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -34,18 +36,21 @@ export default function UserProfile() {
   }, [userLocal.state.user.id]);
 
   const handleEdit = (postId: number) => {
-    // Düzenleme işlemi için yönlendirme veya modal açma
     console.log(`Editing post ${postId}`);
   };
 
   const handleDelete = async (postId: number) => {
-    if (window.confirm("Bu gönderiyi silmek istediğinizden emin misiniz?")) {
-      try {
-        // await userServices.deletePost(postId);
+    try {
+      const confirmed = await alerts.question("Gönderi Silme!", "Bu gönderiyi silmek istediğinizden emin misiniz?");
+      console.log("Confirmed:", confirmed);
+      if (confirmed) {
+        await userServices.deleteUserPost(postId);
         setPosts(posts.filter((post) => post.id !== postId));
-      } catch (error) {
-        console.error("Error deleting post:", error);
+        alerts.success("Başarılı", "Gönderi başarıyla silindi.");
       }
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      alerts.error("Hata", "Gönderi silinirken bir hata oluştu.");
     }
   };
 

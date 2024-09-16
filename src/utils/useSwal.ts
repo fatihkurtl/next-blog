@@ -22,8 +22,23 @@ export function useSwal() {
     });
   };
 
+  const question = (title: string, text: string): Promise<boolean> => {
+    return new Promise((resolve) => {
+      Swal.fire({
+        title: title,
+        text: text,
+        icon: "question",
+        showConfirmButton: true,
+        showCancelButton: true,
+      }).then((result) => {
+        resolve(result.isConfirmed);
+      });
+    });
+  };
+
   return {
     success,
     error,
+    question,
   };
 }
