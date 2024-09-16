@@ -37,4 +37,10 @@ export class UserServices {
       "Content-Type": "multipart/form-data",
     });
   }
+
+  async getUserPosts(id: number): Promise<any> {
+    return this.api.get(`/users/posts/${id}`, {
+      "Content-Type": "multipart/form-data",
+    });
+  }
 }

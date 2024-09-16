@@ -25,6 +25,25 @@ export const createPostTable = async () => {
             )`);
 
     console.log("Post table created/exists");
+
+
+    const columnExists = await query(`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name='posts' AND column_name='user_id'
+    `);
+
+    if (columnExists.rowCount === 0) {
+      await query(`
+        ALTER TABLE posts 
+        ADD COLUMN user_id INTEGER,
+        ADD CONSTRAINT fk_user
+        FOREIGN KEY (user_id) 
+        REFERENCES users(id)
+      `);
+      console.log("user_id column added to posts table");
+    }
+
   } catch (error) {
     console.error(error);
   }

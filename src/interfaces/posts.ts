@@ -17,4 +17,5 @@ export interface BlogPost {
     imageUrl: File | null;
     content: string;
     author: string;
+    user_id: number;
   }

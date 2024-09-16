@@ -276,8 +276,37 @@ export const updateUserPassword = async (req: Request, res: Response) => {
         if (selectedUser.rows[0].password !== hashedPassword) {
             return res.status(400).json({ error: "Eski şifre hatalı." });
         }
+
+        const hashedNewPassword = crypto.createHash("sha256").update(newPassword).digest("hex");
+       await query("UPDATE users SET password = $1 WHERE id = $2", [hashedNewPassword, id]);
         
         return res.status(200).json({ success: true, message: "Şifre güncellendi." });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+
+export const getUserPosts = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const result = await query("SELECT * FROM posts WHERE user_id = $1", [id]);
+        const baseUrl = `${req.protocol}://${req.get('host')}`;
+        const userPosts = result.rows.map(post => {
+            const imageUrl = post.imageurl || post.imageUrl;
+            return {
+                ...post,
+                imageUrl: imageUrl ? (imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`) : null,
+                imageurl: undefined
+            };
+        });
+        const postsWithCategories = await Promise.all(userPosts.map(async (post) => {
+            const category = await query('SELECT name FROM categories WHERE id = $1', [post.category_id]);
+            return { ...post, category: category.rows[0].name };
+        }));
+                
+        res.status(200).json({ data: postsWithCategories });
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: "Internal server error" });

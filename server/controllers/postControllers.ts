@@ -80,7 +80,7 @@ export const createPost = async (req: Request, res: Response) => {
         // console.log('Request method:', req.method);
         // console.log('Request file:', req.file);
         let imageUrl = null;
-        const { title, subtitle, category, content, author } = req.body;
+        const { title, subtitle, category, content, author, user_id } = req.body;
 
         console.log('author:', author);
 
@@ -105,8 +105,8 @@ export const createPost = async (req: Request, res: Response) => {
         }
 
         const result = await query(
-            'INSERT INTO posts (title, subTitle, category_id, imageUrl, content, author) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [title, subtitle, categoryId, imageUrl, content, author]
+            'INSERT INTO posts (title, subTitle, category_id, imageUrl, content, author, user_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [title, subtitle, categoryId, imageUrl, content, author, user_id]
         );
         const newPost: BlogPost = result.rows[0];
         res.status(201).json({ message: 'Gönderi başarıyla oluşturuldu', 'success': true, data: newPost });

@@ -6,9 +6,17 @@ import { slugify } from "@/utils/slugify";
 
 interface PostListProps {
   posts: BlogPost[];
+  showEditDelete?: boolean;
+  onEdit?: (postId: number) => void;
+  onDelete?: (postId: number) => void;
 }
 
-export default function PostList({ posts }: PostListProps) {
+export default function PostList({
+  posts,
+  showEditDelete = false,
+  onEdit,
+  onDelete,
+}: PostListProps) {
   return (
     <>
       {posts.length > 0 ? (
@@ -37,7 +45,6 @@ export default function PostList({ posts }: PostListProps) {
               <div className="col-md-8">
                 <div className="card-body">
                   <h5 className="card-title">{post.title}</h5>
-                  {/* <p className="card-text">{post.subtitle}</p> */}
                   <p className="card-text">
                     <small>Kategori: {post.category}</small>
                   </p>
@@ -53,10 +60,26 @@ export default function PostList({ posts }: PostListProps) {
                       pathname: `/blog/post/${slugify(post.title)}`,
                       query: { id: post.id },
                     }}
-                    className="btn btn-primary"
+                    className="btn btn-primary me-2"
                   >
                     Devamını Oku
                   </Link>
+                  {showEditDelete && (
+                    <>
+                      <button
+                        onClick={() => onEdit && onEdit(post.id)}
+                        className="btn btn-secondary me-2"
+                      >
+                        Düzenle
+                      </button>
+                      <button
+                        onClick={() => onDelete && onDelete(post.id)}
+                        className="btn btn-danger"
+                      >
+                        Sil
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

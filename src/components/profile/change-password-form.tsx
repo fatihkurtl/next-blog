@@ -47,6 +47,12 @@ export default function ChangePasswordForm() {
       );
       if (response.success === true) {
         console.log(response);
+        alerts.success("Başarılı", "Şifre değiştirildi.");
+        setChangePasswordForm({
+          oldPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        })
       }
     } catch (error) {
       console.log(error);

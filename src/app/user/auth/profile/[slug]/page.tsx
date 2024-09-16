@@ -11,33 +11,43 @@ import ChangePasswordForm from "@/components/profile/change-password-form";
 const userServices = new UserServices(api);
 
 export default function UserProfile() {
+  const userLocal = JSON.parse(localStorage.getItem("user-storage") || "{}");
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const userPosts: BlogPost[] = [
-    {
-      id: 1,
-      title: "React Hooks Kullanımı",
-      subtitle: "Modern React uygulamalarında state yönetimi",
-      category_id: 1,
-      category: "Web Geliştirme",
-      imageUrl: "/images/react-hooks.jpg",
-      content:
-        "React Hooks, fonksiyon bileşenlerinde state ve yaşam döngüsü özelliklerini kullanmanıza olanak tanır...",
-      date: "2023-05-15",
-      author: "ornek_kullanici",
-    },
-    {
-      id: 2,
-      title: "TypeScript ile Daha Güvenli Kod Yazımı",
-      subtitle: "JavaScript projelerinizi TypeScript ile güçlendirin",
-      category_id: 2,
-      category: "Programlama Dilleri",
-      imageUrl: "/images/typescript.jpg",
-      content:
-        "TypeScript, JavaScript'e statik tip tanımlama özelliği ekleyerek daha güvenli ve ölçeklenebilir kod yazmanıza yardımcı olur...",
-      date: "2023-05-20",
-      author: "ornek_kullanici",
-    },
-  ];
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const fetchedPosts = await userServices.getUserPosts(
+          userLocal.state.user.id
+        );
+        console.log("user posts", fetchedPosts);
+        setPosts(fetchedPosts.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPosts();
+  }, [userLocal.state.user.id]);
+
+  const handleEdit = (postId: number) => {
+    // Düzenleme işlemi için yönlendirme veya modal açma
+    console.log(`Editing post ${postId}`);
+  };
+
+  const handleDelete = async (postId: number) => {
+    if (window.confirm("Bu gönderiyi silmek istediğinizden emin misiniz?")) {
+      try {
+        // await userServices.deletePost(postId);
+        setPosts(posts.filter((post) => post.id !== postId));
+      } catch (error) {
+        console.error("Error deleting post:", error);
+      }
+    }
+  };
 
   return (
     <div className="container mt-5">
@@ -64,8 +74,15 @@ export default function UserProfile() {
           <div className="card">
             <div className="card-body">
               <h2 className="card-title mb-4">Paylaşılan Gönderiler</h2>
-              {userPosts.length > 7 ? (
-                <PostList posts={userPosts} />
+              {loading ? (
+                <p>Gönderiler yükleniyor...</p>
+              ) : posts.length > 0 ? (
+                <PostList
+                  posts={posts}
+                  showEditDelete={true}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
               ) : (
                 <>
                   <p>Henüz paylaştığınız bir gönderi yok.</p>

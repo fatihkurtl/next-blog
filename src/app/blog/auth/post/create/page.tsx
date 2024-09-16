@@ -34,6 +34,7 @@ export default function SharePost() {
     category: "",
     imageUrl: null,
     author: loggedInUser.fullname !== "" ? loggedInUser.fullname : "",
+    user_id: loggedInUser.id !== 0 ? loggedInUser.id : 0,
   });
 
   const router = useRouter();
