@@ -55,4 +55,10 @@ export class UserServices {
       "Content-Type": "multipart/form-data",
     });
   }
+
+  async userTokenController(token: string): Promise<any> {
+    return this.api.post("/users/token", token, {
+      "Content-Type": "multipart/form-data",
+    });
+  }
 }

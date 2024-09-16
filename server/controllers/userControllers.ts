@@ -423,7 +423,9 @@ export const deleteUserPost = async (req: Request, res: Response) => {
   }
 };
 
-export const isTokenValid = async (token: string): Promise<boolean> => {
+export const isTokenValid = async (req: Request, res: Response): Promise<boolean> => {
+  const { token } = req.body;
+  console.log(token);
   const result = await query(
     "SELECT * FROM tokens WHERE token = $1 AND expires_at > NOW()",
     [token]
