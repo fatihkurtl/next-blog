@@ -5,16 +5,23 @@ import api from "@/services/api";
 import { PostServices } from "@/helpers/posts";
 import PostList from "@/components/blog/post-list";
 import CategoriesSidebar from "@/components/blog/categories-sidebar";
+import Pagination from "@/components/blog/pagination";
 
 const postServices = new PostServices(api);
-
-// const categories = ["Web Geliştirme", "JavaScript", "CSS", "React", "Node.js"];
 
 export default function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<string[]>([]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 5;
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -64,7 +71,13 @@ export default function Blog() {
       <div className="row">
         <div className="col-md-8">
           <h2 className="mb-4">Tüm Yazılar</h2>
-          <PostList posts={posts} />
+          <PostList posts={currentPosts} />
+          <Pagination
+            postsPerPage={postsPerPage}
+            totalPosts={posts.length}
+            paginate={paginate}
+            currentPage={currentPage}
+          />
         </div>
         <div className="col-md-4">
           <h2 className="mb-4">Kategoriler</h2>

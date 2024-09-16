@@ -9,7 +9,7 @@ export default function AboutPage() {
   const aboutUs = {
     title: "Biz Kimiz?",
     content: [
-      "Kod Dünyası, 2020 yılında bir grup tutkulu yazılım geliştirici tarafından kuruldu. Amacımız, yazılım dünyasındaki en son gelişmeleri, en iyi uygulamaları ve pratik ipuçlarını hem yeni başlayanlara hem de deneyimli geliştiricilere ulaştırmaktır.",
+      "Blog Sitesi, 2020 yılında bir grup tutkulu yazılım geliştirici tarafından kuruldu. Amacımız, yazılım dünyasındaki en son gelişmeleri, en iyi uygulamaları ve pratik ipuçlarını hem yeni başlayanlara hem de deneyimli geliştiricilere ulaştırmaktır.",
       "Blogumuzda web geliştirme, mobil uygulama geliştirme, veri bilimi, yapay zeka ve daha birçok konuda makaleler bulabilirsiniz."
     ],
     imageUrl: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",

@@ -37,7 +37,7 @@ export function AuthWrapper({ children }: { children: React.ReactNode }) {
     if (window.location.pathname.includes("/auth/")) {
       checkAuth();
     }
-  }, []);
+  }, [user.state.user.token, router, logOut, user.state.user.expires_at]);
 
   return <>{children}</>;
 }
