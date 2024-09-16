@@ -260,83 +260,168 @@ export const updateUser = async (req: Request, res: Response) => {
 };
 
 export const updateUserPassword = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const { oldPassword, newPassword } = req.body;
-        console.log("user id:", id);
-        console.log("user update body:", oldPassword, newPassword);
-        const selectedUser = await query("SELECT * FROM users WHERE id = $1", [id]);
-        console.log("selectedUser:", selectedUser.rows[0]);
-        if (selectedUser.rowCount === 0) {
-            return res.status(400).json({ error: "Kullanıcı bulunamadı." });
-        }
-        
-        const hashedPassword = crypto.createHash("sha256").update(oldPassword).digest("hex");
-
-        if (selectedUser.rows[0].password !== hashedPassword) {
-            return res.status(400).json({ error: "Eski şifre hatalı." });
-        }
-
-        const hashedNewPassword = crypto.createHash("sha256").update(newPassword).digest("hex");
-       await query("UPDATE users SET password = $1 WHERE id = $2", [hashedNewPassword, id]);
-        
-        return res.status(200).json({ success: true, message: "Şifre güncellendi." });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+  try {
+    const { id } = req.params;
+    const { oldPassword, newPassword } = req.body;
+    console.log("user id:", id);
+    console.log("user update body:", oldPassword, newPassword);
+    const selectedUser = await query("SELECT * FROM users WHERE id = $1", [id]);
+    console.log("selectedUser:", selectedUser.rows[0]);
+    if (selectedUser.rowCount === 0) {
+      return res.status(400).json({ error: "Kullanıcı bulunamadı." });
     }
+
+    const hashedPassword = crypto
+      .createHash("sha256")
+      .update(oldPassword)
+      .digest("hex");
+
+    if (selectedUser.rows[0].password !== hashedPassword) {
+      return res.status(400).json({ error: "Eski şifre hatalı." });
+    }
+
+    const hashedNewPassword = crypto
+      .createHash("sha256")
+      .update(newPassword)
+      .digest("hex");
+    await query("UPDATE users SET password = $1 WHERE id = $2", [
+      hashedNewPassword,
+      id,
+    ]);
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Şifre güncellendi." });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
-
 export const getUserPosts = async (req: Request, res: Response) => {
-    try {
-        const { id } = req.params;
-        const result = await query("SELECT * FROM posts WHERE user_id = $1", [id]);
-        const baseUrl = `${req.protocol}://${req.get('host')}`;
-        const userPosts = result.rows.map(post => {
-            const imageUrl = post.imageurl || post.imageUrl;
-            return {
-                ...post,
-                imageUrl: imageUrl ? (imageUrl.startsWith('http') ? imageUrl : `${baseUrl}${imageUrl}`) : null,
-                imageurl: undefined
-            };
-        });
-        const postsWithCategories = await Promise.all(userPosts.map(async (post) => {
-            const category = await query('SELECT name FROM categories WHERE id = $1', [post.category_id]);
-            return { ...post, category: category.rows[0].name };
-        }));
-                
-        res.status(200).json({ data: postsWithCategories });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+  try {
+    const { id } = req.params;
+    const result = await query("SELECT * FROM posts WHERE user_id = $1", [id]);
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const userPosts = result.rows.map((post) => {
+      const imageUrl = post.imageurl || post.imageUrl;
+      return {
+        ...post,
+        imageUrl: imageUrl
+          ? imageUrl.startsWith("http")
+            ? imageUrl
+            : `${baseUrl}${imageUrl}`
+          : null,
+        imageurl: undefined,
+      };
+    });
+    const postsWithCategories = await Promise.all(
+      userPosts.map(async (post) => {
+        const category = await query(
+          "SELECT name FROM categories WHERE id = $1",
+          [post.category_id]
+        );
+        return { ...post, category: category.rows[0].name };
+      })
+    );
+
+    res.status(200).json({ data: postsWithCategories });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const updateUserPost = async (req: Request, res: Response) => {
+  try {
+    let imageUrl = null;
+    const { id } = req.params;
+    const { title, subtitle, category, category_id, content, user_id } =
+      req.body;
+    console.log("req.body:", req.body);
+    console.log("post id:", id);
+    const selectedPost = await query("SELECT * FROM posts WHERE id = $1", [id]);
+    const post = selectedPost.rows[0];
+    if (post.rowCount === 0) {
+      return res.status(400).json({ error: "Post bulunamadı." });
     }
+    if (req.file) {
+      try {
+        console.log("req.file:", req.file);
+        console.log(
+          "Received file:",
+          req.file.originalname,
+          req.file.mimetype,
+          req.file.size
+        );
+        await deleteOldImage(post.imageurl);
+        imageUrl = await uploadFile(req.file);
+
+        const updatePostImage = await query(
+          "UPDATE posts SET imageUrl = $1 WHERE id = $2",
+          [imageUrl, id]
+        );
+        console.log("updatePostImage:", updatePostImage);
+      } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: "Dosya yüklenirken bir hata oluştu." });
+      }
+    } else {
+      imageUrl = post.imageurl;
+    }
+
+    const updatePost = await query(
+      "UPDATE posts SET title = $1, subtitle = $2, category_id = $3, content = $4, imageurl = $5 WHERE id = $6",
+      [title, subtitle, category_id, content, imageUrl, id]
+    );
+
+    // const updatePostCategory = await query(
+    //   "UPDATE categories SET name = $1 WHERE id = $2",
+    //   [category, category_id]
+    // );
+    // console.log("updatePostCategory:", updatePostCategory.rows[0]);
+
+    if (updatePost.rowCount === 0) {
+      return res.status(400).json({ error: "Post güncellenemedi." });
+    }
+    console.log("updatePost:", updatePost.rows[0]);
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Gönderi güncellendi." });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 };
 
 export const deleteUserPost = async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      const post = await query("SELECT * FROM posts WHERE id = $1", [id]);
-      if (post.rowCount === 0) {
-        return res.status(400).json({ error: "Post bulunamadı." });
-      }
-
-      const userPost = await query("DELETE FROM posts WHERE id = $1 RETURNING *", [id]);
-
-      if (userPost.rowCount === 0) {
-        return res.status(400).json({ error: "Post silinemedi." });
-      }
-      if (post.rows[0].imageurl) {
-        const imageUrl = post.rows[0].imageurl;
-        await deleteOldImage(imageUrl);
-      }
-
-      res.status(200).json({ success: true, message: "Gönderi silindi." });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({ error: "Internal server error" });
+  try {
+    const { id } = req.params;
+    const post = await query("SELECT * FROM posts WHERE id = $1", [id]);
+    if (post.rowCount === 0) {
+      return res.status(400).json({ error: "Post bulunamadı." });
     }
-}
+
+    const userPost = await query(
+      "DELETE FROM posts WHERE id = $1 RETURNING *",
+      [id]
+    );
+
+    if (userPost.rowCount === 0) {
+      return res.status(400).json({ error: "Post silinemedi." });
+    }
+    if (post.rows[0].imageurl) {
+      const imageUrl = post.rows[0].imageurl;
+      await deleteOldImage(imageUrl);
+    }
+
+    res.status(200).json({ success: true, message: "Gönderi silindi." });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 
 export const isTokenValid = async (token: string): Promise<boolean> => {
   const result = await query(

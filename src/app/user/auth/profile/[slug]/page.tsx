@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import api from "@/services/api";
 import { UserServices } from "@/helpers/users";
 import PostList from "@/components/blog/post-list";
@@ -8,10 +9,12 @@ import { BlogPost } from "@/interfaces/posts";
 import ProfileInfoForm from "@/components/profile/profile-info-form";
 import ChangePasswordForm from "@/components/profile/change-password-form";
 import { useSwal } from "@/utils/useSwal";
+import { slugify } from "@/utils/slugify";
 
 const userServices = new UserServices(api);
 
 export default function UserProfile() {
+  const router = useRouter();
   const alerts = useSwal();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -35,8 +38,9 @@ export default function UserProfile() {
     fetchPosts();
   }, []);
 
-  const handleEdit = (postId: number) => {
-    console.log(`Editing post ${postId}`);
+  const handleEdit = (postId: number, postTitle: string) => {
+    console.log(`Editing post ${postId} with title: ${postTitle}`);
+    router.push(`/blog/auth/post/edit/${slugify(postTitle)}?id=${postId}`);
   };
 
   const handleDelete = async (postId: number) => {

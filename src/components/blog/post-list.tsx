@@ -7,7 +7,7 @@ import { slugify } from "@/utils/slugify";
 interface PostListProps {
   posts: BlogPost[];
   showEditDelete?: boolean;
-  onEdit?: (postId: number) => void;
+  onEdit?: (postId: number, postTitle: string) => void;
   onDelete?: (postId: number) => void;
 }
 
@@ -67,7 +67,7 @@ export default function PostList({
                   {showEditDelete && (
                     <>
                       <button
-                        onClick={() => onEdit && onEdit(post.id)}
+                        onClick={() => onEdit && onEdit(post.id, post.title)}
                         className="btn btn-secondary me-2"
                       >
                         Düzenle

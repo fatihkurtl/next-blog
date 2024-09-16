@@ -7,10 +7,22 @@ export interface BlogPost {
     imageUrl: string;
     content: string;
     date: string;
+    user_id: number;
     author: string;
   }
 
   export interface BlogPostCreate {
+    title: string;
+    subtitle: string;
+    category: string;
+    imageUrl: File | null;
+    content: string;
+    author: string;
+    user_id: number;
+  }
+
+  export interface BlogPostEdit {
+    id: number;
     title: string;
     subtitle: string;
     category: string;

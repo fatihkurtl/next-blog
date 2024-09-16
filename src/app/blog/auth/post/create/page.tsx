@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import api from "@/services/api";
 import { BlogPostCreate } from "@/interfaces/posts";
 import { PostServices } from "@/helpers/posts";
@@ -173,6 +174,19 @@ export default function SharePost() {
             accept="image/*"
             onChange={handleImageChange}
           />
+          {post.imageUrl && (
+          <div className="mt-2">
+            <p>Önizleme:</p>
+            <Image
+              src={URL.createObjectURL(post.imageUrl)}
+              alt="Görsel önizleme"
+              width={200}
+              height={200}
+              objectFit="contain"
+              className="img-thumbnail w-50"
+            />
+          </div>
+        )}
         </div>
         <button type="submit" className="btn btn-primary">
           Paylaş
