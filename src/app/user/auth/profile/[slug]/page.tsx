@@ -12,12 +12,12 @@ import { useSwal } from "@/utils/useSwal";
 const userServices = new UserServices(api);
 
 export default function UserProfile() {
-  const userLocal = JSON.parse(localStorage.getItem("user-storage") || "{}");
   const alerts = useSwal();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    const userLocal = JSON.parse(localStorage.getItem("user-storage") || "{}");
     const fetchPosts = async () => {
       try {
         setLoading(true);
@@ -33,7 +33,7 @@ export default function UserProfile() {
       }
     };
     fetchPosts();
-  }, [userLocal.state.user.id]);
+  }, []);
 
   const handleEdit = (postId: number) => {
     console.log(`Editing post ${postId}`);
@@ -41,7 +41,10 @@ export default function UserProfile() {
 
   const handleDelete = async (postId: number) => {
     try {
-      const confirmed = await alerts.question("Gönderi Silme!", "Bu gönderiyi silmek istediğinizden emin misiniz?");
+      const confirmed = await alerts.question(
+        "Gönderi Silme!",
+        "Bu gönderiyi silmek istediğinizden emin misiniz?"
+      );
       console.log("Confirmed:", confirmed);
       if (confirmed) {
         await userServices.deleteUserPost(postId);
